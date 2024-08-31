@@ -1,10 +1,12 @@
 //
-//  HomeViewModel.swift
+//  PostViewModel.swift
 //  MSConnectionLib
 //
 //  Created by Moha on 8/31/24.
 //
 
+import Foundation
+import SwiftUI
 
 class PostViewModel: ObservableObject {
     @Published var data: [PostModel] = []
