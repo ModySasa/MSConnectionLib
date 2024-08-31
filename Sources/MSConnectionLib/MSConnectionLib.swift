@@ -1,2 +1,5 @@
-// The Swift Programming Language
-// https://docs.swift.org/swift-book
+public actor MSConnectionLib{
+    static let shared = MSConnectionLib()
+    
+    public let networkManager: NetworkManager = NetworkManager()
+}
