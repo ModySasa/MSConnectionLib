@@ -10,10 +10,17 @@ import OSLog
 
 public actor NetworkManager {
     let errorLogger: ErrorLogger = .shared
+            
+    private let parentClassName: String
+        
+    // Updated initializer without directly using 'self'
+    public init(T: Any.Type = NetworkManager.self) {
+        self.parentClassName = String(describing: T)
+    }
     
-    var className : String {
-        let mirror = Mirror(reflecting: self)
-        return String(describing: mirror.subjectType)
+    // Class name property returning the parent class name
+    var className: String {
+        return parentClassName
     }
     
     public func get<T: Decodable>(
