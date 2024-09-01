@@ -6,14 +6,24 @@
 //
 
 import Foundation
+import OSLog
 
 public actor NetworkManager {
+    let errorLogger: ErrorLogger = .shared
     
-    public func get<T: Decodable>(from url: URL, responseType: T.Type) async -> Result<T, MultipleDecodingErrors> {
+    var className : String {
+        let mirror = Mirror(reflecting: self)
+        return String(describing: mirror.subjectType)
+    }
+    
+    public func get<T: Decodable>(
+        from url: URL
+        , responseType: T.Type
+    ) async -> Result<T, MultipleDecodingErrors> {
         var data: Data = Data() // Initialize data
         do {
             (data, _) = try await URLSession.shared.data(from: url)
-//            inspectRawJSON(data: data)
+            //            inspectRawJSON(data: data)
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             let response = try decoder.decode(T.self, from: data)
@@ -37,8 +47,12 @@ public actor NetworkManager {
             return .failure(MultipleDecodingErrors(errors: [.other(error)]))
         }
     }
-
-    public func post<T: Decodable, U: Encodable>(to url: URL, body: U, responseType: T.Type) async -> Result<T, MultipleDecodingErrors> {
+    
+    public func post<T: Decodable, U: Encodable>(
+        to url: URL
+        , body: U
+        , responseType: T.Type
+    ) async -> Result<T, MultipleDecodingErrors> {
         var data: Data = Data() // Initialize data
         do {
             var request = URLRequest(url: url)
@@ -47,7 +61,7 @@ public actor NetworkManager {
             request.httpBody = try JSONEncoder().encode(body)
             
             (data, _) = try await URLSession.shared.data(for: request)
-//            inspectRawJSON(data: data)
+            //            inspectRawJSON(data: data)
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             let response = try decoder.decode(T.self, from: data)
@@ -71,22 +85,30 @@ public actor NetworkManager {
             return .failure(MultipleDecodingErrors(errors: [.other(error)]))
         }
     }
-
-    private func logDecodingError(_ error: Swift.DecodingError, data: Data) {
+    
+    private func logDecodingError(
+        _ error: Swift.DecodingError
+        , data: Data
+    ) {
         let dataString = String(data: data, encoding: .utf8) ?? "Unable to convert data to string"
-        print("Decoding error: \(error)\nData: \(dataString)")
-    }
-
-    private func logError(_ error: Error) {
-        print("Error: \(error)")
+        errorLogger.debug("Decoding error: \(error)\nData: \(dataString)" , className: className)
     }
     
-    func inspectRawJSON(data: Data) {
+    private func logError(
+        _ error: Error
+    ) {
+        errorLogger.error("Error: \(error)" , className: className)
+    }
+    
+    func inspectRawJSON(
+        data: Data
+    ) {
         do {
             let jsonObject = try JSONSerialization.jsonObject(with: data, options: .mutableContainers)
-            print("Raw JSON: \(jsonObject)")
+            let message = "Raw JSON: \(jsonObject)"
+            errorLogger.error("Raw JSON: \(message)" , className: className)
         } catch {
-            print("Failed to convert data to JSON object: \(error)")
+            errorLogger.error("Failed to convert data to JSON object: \(error)" , className: className)
         }
     }
 }
