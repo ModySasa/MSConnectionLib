@@ -14,7 +14,7 @@ public enum DecodingError: Error {
     case dataCorrupted(String)
     case other(Error)
     
-    var description: String {
+    public var description: String {
         switch self {
         case .missingKey(let key):
             return "Missing key: \(key)"

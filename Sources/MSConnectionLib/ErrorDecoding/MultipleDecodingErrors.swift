@@ -8,9 +8,9 @@
 import Foundation
 
 public struct MultipleDecodingErrors: Error {
-    let errors: [DecodingError]
+    public let errors: [DecodingError]
     
-    var description: String {
+    public var description: String {
         errors.map { $0.description }.joined(separator: "\n")
     }
 }
