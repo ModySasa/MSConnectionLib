@@ -7,6 +7,7 @@
 
 import Foundation
 import OSLog
+import SwiftUI
 
 public actor NetworkManager {
     let errorLogger: ErrorLogger = .shared
@@ -23,18 +24,40 @@ public actor NetworkManager {
         return parentClassName
     }
     
-    public func get<T: Decodable>(
-        from url: URL
-        , responseType: T.Type
+    public func get<T: Decodable, U: Encodable>(
+        to url: URL,
+        lang: String = "en",
+        loadingdata : Binding<Bool> ,
+        body: U? = nil,
+        responseType: T.Type,
+        token: String? = nil // Added token parameter with default value
     ) async -> Result<T, MultipleDecodingErrors> {
         var data: Data = Data() // Initialize data
         do {
-            (data, _) = try await URLSession.shared.data(from: url)
-            //            inspectRawJSON(data: data)
+            var request = URLRequest(url: url)
+            request.httpMethod = HTTPMethod.get.rawValue
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("application/json", forHTTPHeaderField: "Accept")
+            request.setValue(lang, forHTTPHeaderField: "lang")
+            
+            if let body {
+                request.httpBody = try JSONEncoder().encode(body)
+            }
+            
+            if let token = token {
+                request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+                request.setValue(token, forHTTPHeaderField: "token")
+            }
+            
+            
+            (data, _) = try await URLSession.shared.data(for: request)
+            
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
+            
             let response = try decoder.decode(T.self, from: data)
             return .success(response)
+            
         } catch let error as Swift.DecodingError {
             // Handle decoding errors
             var decodingErrors: [DecodingError] = []
@@ -56,19 +79,29 @@ public actor NetworkManager {
     }
     
     public func post<T: Decodable, U: Encodable>(
-        to url: URL
-        , body: U
-        , responseType: T.Type
+        to url: URL,
+        httpMethod: HTTPMethod = .post,
+        lang: String = "en",
+        loadingdata : Binding<Bool> ,
+        body: U,
+        responseType: T.Type,
+        token: String? = nil // Added token parameter with default value
     ) async -> Result<T, MultipleDecodingErrors> {
         var data: Data = Data() // Initialize data
         do {
             var request = URLRequest(url: url)
-            request.httpMethod = "POST"
+            request.httpMethod = httpMethod.rawValue
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("application/json", forHTTPHeaderField: "Accept")
+            request.setValue(lang, forHTTPHeaderField: "lang")
             request.httpBody = try JSONEncoder().encode(body)
             
+            if let token = token {
+                request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+                request.setValue(token, forHTTPHeaderField: "token")
+            }
+            
             (data, _) = try await URLSession.shared.data(for: request)
-            //            inspectRawJSON(data: data)
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             let response = try decoder.decode(T.self, from: data)
@@ -94,8 +127,8 @@ public actor NetworkManager {
     }
     
     private func logDecodingError(
-        _ error: Swift.DecodingError
-        , data: Data
+        _ error: Swift.DecodingError,
+        data: Data
     ) {
         let dataString = String(data: data, encoding: .utf8) ?? "Unable to convert data to string"
         errorLogger.debug("Decoding error: \(error)\nData: \(dataString)" , className: className)
@@ -118,4 +151,13 @@ public actor NetworkManager {
             errorLogger.error("Failed to convert data to JSON object: \(error)" , className: className)
         }
     }
+}
+
+public enum HTTPMethod: String {
+    case get = "GET"
+    case post = "POST"
+    case put = "PUT"
+    case delete = "DELETE"
+    case patch = "PATCH"
+    // Add other methods as needed
 }
