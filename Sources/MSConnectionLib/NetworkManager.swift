@@ -34,8 +34,10 @@ public actor NetworkManager {
         guard let theUrl = URL(string: url) else {
             return .failure(MultipleDecodingErrors(errors: [.other(URLError.init(.badURL))]))
         }
-        print("URL IS : " , theUrl)
+        print("urlPrint ::: " , theUrl)
+        
         var data: Data = Data() // Initialize data
+        
         do {
             var request = URLRequest(url: theUrl)
             request.httpMethod = HTTPMethod.get.rawValue
@@ -52,8 +54,9 @@ public actor NetworkManager {
                 request.setValue(token, forHTTPHeaderField: "token")
             }
             
-            
             (data, _) = try await URLSession.shared.data(for: request)
+            
+            logData(data)
             
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -109,6 +112,9 @@ public actor NetworkManager {
             }
             
             (data, _) = try await URLSession.shared.data(for: request)
+            
+            logData(data)
+            
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             let response = try decoder.decode(T.self, from: data)
@@ -156,6 +162,12 @@ public actor NetworkManager {
             errorLogger.error("Raw JSON: \(message)" , className: className)
         } catch {
             errorLogger.error("Failed to convert data to JSON object: \(error)" , className: className)
+        }
+    }
+    
+    func logData(_ data:Data) {
+        if let dataString = String(data: data, encoding: .utf8) {
+            errorLogger.debug("Server response is :\n\(dataString)")
         }
     }
 }
