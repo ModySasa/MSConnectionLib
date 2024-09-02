@@ -25,16 +25,19 @@ public actor NetworkManager {
     }
     
     public func get<T: Decodable, U: Encodable>(
-        from url: URL,
+        from url: String,
         lang: String = "en",
-        loadingdata : Binding<Bool> ,
         body: U? = nil,
         responseType: T.Type,
         token: String? = nil // Added token parameter with default value
     ) async -> Result<T, MultipleDecodingErrors> {
+        guard let theUrl = URL(string: url) else {
+            return .failure(MultipleDecodingErrors(errors: [.other(URLError.init(.badURL))]))
+        }
+        
         var data: Data = Data() // Initialize data
         do {
-            var request = URLRequest(url: url)
+            var request = URLRequest(url: theUrl)
             request.httpMethod = HTTPMethod.get.rawValue
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue("application/json", forHTTPHeaderField: "Accept")
@@ -79,17 +82,20 @@ public actor NetworkManager {
     }
     
     public func post<T: Decodable, U: Encodable>(
-        to url: URL,
+        to url: String,
         httpMethod: HTTPMethod = .post,
         lang: String = "en",
-        loadingdata : Binding<Bool> ,
         body: U,
         responseType: T.Type,
         token: String? = nil // Added token parameter with default value
     ) async -> Result<T, MultipleDecodingErrors> {
+        guard let theUrl = URL(string: url) else {
+            return .failure(MultipleDecodingErrors(errors: [.other(URLError.init(.badURL))]))
+        }
+        
         var data: Data = Data() // Initialize data
         do {
-            var request = URLRequest(url: url)
+            var request = URLRequest(url: theUrl)
             request.httpMethod = httpMethod.rawValue
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue("application/json", forHTTPHeaderField: "Accept")
