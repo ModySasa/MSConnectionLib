@@ -25,7 +25,7 @@ public actor NetworkManager {
     }
     
     public func get<T: Decodable, U: Encodable>(
-        to url: URL,
+        from url: URL,
         lang: String = "en",
         loadingdata : Binding<Bool> ,
         body: U? = nil,
