@@ -34,7 +34,7 @@ public actor NetworkManager {
         guard let theUrl = URL(string: url) else {
             return .failure(MultipleDecodingErrors(errors: [.other(URLError.init(.badURL))]))
         }
-        
+        print("URL IS : " , theUrl)
         var data: Data = Data() // Initialize data
         do {
             var request = URLRequest(url: theUrl)
@@ -92,6 +92,7 @@ public actor NetworkManager {
         guard let theUrl = URL(string: url) else {
             return .failure(MultipleDecodingErrors(errors: [.other(URLError.init(.badURL))]))
         }
+        print("URL IS : " , theUrl)
         
         var data: Data = Data() // Initialize data
         do {
