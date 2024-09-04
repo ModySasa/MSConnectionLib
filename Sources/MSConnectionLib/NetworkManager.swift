@@ -11,7 +11,7 @@ import SwiftUI
 
 public actor NetworkManager {
     let errorLogger: ErrorLogger = .shared
-            
+    public let optionalBody = Optional<String>.none
     private let parentClassName: String
         
     // Updated initializer without directly using 'self'

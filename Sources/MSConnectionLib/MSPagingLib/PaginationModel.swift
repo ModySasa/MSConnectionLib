@@ -24,7 +24,6 @@ public struct PaginationModel : Codable  {
         didSet {
             if let meta = meta {
                 if let total = meta.total,
-                    let count = meta.count,
                     let per_page = meta.per_page,
                     let current_page = meta.current_page,
                     let total_pages = meta.total_pages,
