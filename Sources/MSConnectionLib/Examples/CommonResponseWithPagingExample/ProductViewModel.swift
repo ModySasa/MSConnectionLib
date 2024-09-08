@@ -28,12 +28,12 @@ class ProductViewModel: ObservableObject {
         switch result {
         case .success(let response):
             response.handleStatus {
-                self.product = response.data.product
+                self.product = response.data?.product
             } onFailure: { message in
                 self.errorMessages.append(message)
             } onStringStatus: { st in
                 if let st = st, st == "success" {
-                    self.product = response.data.product
+                    self.product = response.data?.product
                 }
             }
         case .failure(let error):
@@ -58,11 +58,11 @@ class ProductViewModel: ObservableObject {
     }
     
     private func handleResponse(_ response: CommonResponse<ProductListResponse>){
-        if let prods = response.data.data {
+        if let prods = response.data?.data {
             self.products.append(contentsOf: prods)
             print("Fetched \(prods.count) products")
             print("Total Fetched \(self.products.count) products")
         }
-        self.nextPageUrl = response.data.links?.next
+        self.nextPageUrl = response.data?.links?.next
     }
 }
