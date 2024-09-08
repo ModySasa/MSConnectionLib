@@ -7,10 +7,16 @@
 
 import Foundation
 
-struct CommonResponse<T: Codable>: Codable {
-    let status: Status
-    let message: String
-    let data: T
+public struct CommonResponse<T: Codable>: Codable {
+    public let status: Status
+    public let message: String
+    public let data: T?
+    
+    public init(status: Status, message: String, data: T?) {
+            self.status = status
+            self.message = message
+            self.data = data
+        }
     
     func handleStatus(onSuccess:@escaping ()->Void , onFailure:@escaping (String)->Void , onStringStatus : ((String?)->Void)? = nil) {
         switch self.status {

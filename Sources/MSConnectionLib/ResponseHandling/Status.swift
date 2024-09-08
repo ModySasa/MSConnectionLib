@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum Status: Codable {
+public enum Status: Codable {
     case boolean(Bool)
     case string(String)
     case int(Int)
@@ -39,7 +39,7 @@ enum Status: Codable {
     }
 
     // Custom initializer to decode different types
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         
         if let boolValue = try? container.decode(Bool.self) {
@@ -54,7 +54,7 @@ enum Status: Codable {
     }
 
     // Encoding logic
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
         case .boolean(let value):
