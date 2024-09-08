@@ -44,18 +44,18 @@ public class PagingViewModel<Item: Identifiable & Codable>: ObservableObject {
         switch result {
         case .success(let response):
             response.handleStatus {
-                if let newItems = response.data.data {
+                if let newItems = response.data?.data {
                     self.items.append(contentsOf: newItems)
                 }
-                self.nextPageUrl = response.data.links?.next
+                self.nextPageUrl = response.data?.links?.next
             } onFailure: { message in
                 self.errorMessages.append(message)
             } onStringStatus: { st in
                 if let st = st, st == "success" {
-                    if let newItems = response.data.data {
+                    if let newItems = response.data?.data {
                         self.items.append(contentsOf: newItems)
                     }
-                    self.nextPageUrl = response.data.links?.next
+                    self.nextPageUrl = response.data?.links?.next
                 }
             }
         case .failure(let error):
