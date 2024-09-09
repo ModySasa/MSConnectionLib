@@ -18,7 +18,7 @@ public struct CommonResponse<T: Codable>: Codable {
             self.data = data
         }
     
-    func handleStatus(onSuccess:@escaping ()->Void , onFailure:@escaping (String)->Void , onStringStatus : ((String?)->Void)? = nil) {
+    public func handleStatus(onSuccess:@escaping ()->Void , onFailure:@escaping (String)->Void , onStringStatus : ((String?)->Void)? = nil) {
         switch self.status {
         case .boolean(let value):
             if(value) {
