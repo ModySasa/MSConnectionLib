@@ -18,7 +18,7 @@ public extension BaseUrlProviding {
     }
     
     private var mainUrl: String {
-        if let url = SharedPrefHelper.shared.getUrl(key: .mainUrl) {
+        if let url = URLPrefHelper.shared.getUrl(key: .mainUrl) {
             return url
         } else {
             return ""
@@ -26,7 +26,7 @@ public extension BaseUrlProviding {
     }
     
     private var testUrl: String {
-        if let url = SharedPrefHelper.shared.getUrl(key: .testUrl) {
+        if let url = URLPrefHelper.shared.getUrl(key: .testUrl) {
             return url
         } else {
             return ""
@@ -34,7 +34,7 @@ public extension BaseUrlProviding {
     }
     
     private var imgUrl: String {
-        if let url = SharedPrefHelper.shared.getUrl(key: .imageUrl) {
+        if let url = URLPrefHelper.shared.getUrl(key: .imageUrl) {
             return url
         } else {
             return ""

@@ -1,5 +1,5 @@
 //
-//  SharedPrefHelper.swift
+//  URLPrefHelper.swift
 //  MSConnectionLib
 //
 //  Created by Moha on 9/11/24.
@@ -7,8 +7,8 @@
 
 import Foundation
 
-public class SharedPrefHelper{
-    public static let shared = SharedPrefHelper.init()
+public class URLPrefHelper{
+    public static let shared = URLPrefHelper.init()
     
     public func setUrls(mainUrl:String = "" , testUrl:String = "" , imageUrl:String = ""){
         setUrl(key: .mainUrl, value: mainUrl as AnyObject)
