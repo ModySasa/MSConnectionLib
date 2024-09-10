@@ -9,7 +9,7 @@ import Foundation
 
 public struct CommonResponse<T: Codable>: Codable {
     public let status: Status
-    public let message: String
+    public let message: String?
     public let data: T?
     
     public init(status: Status, message: String, data: T?) {
@@ -24,7 +24,9 @@ public struct CommonResponse<T: Codable>: Codable {
             if(value) {
                 onSuccess()
             } else {
-                onFailure(self.message)
+                if let message = self.message {
+                    onFailure(message)
+                }
             }
         case .string(let value):
             print("String status: \(value)")
@@ -36,20 +38,26 @@ public struct CommonResponse<T: Codable>: Codable {
             if(value == 1) {
                 onSuccess()
             } else {
-                onFailure(self.message)
+                if let message = self.message {
+                    onFailure(message)
+                }
             }
         case .yesNo(let value):
             print("Yes/No status: \(value)")
             if(value) {
                 onSuccess()
             } else {
-                onFailure(self.message)
+                if let message = self.message {
+                    onFailure(message)
+                }
             }
         case .oneZero(let value):
             if(value) {
                 onSuccess()
             } else {
-                onFailure(self.message)
+                if let message = self.message {
+                    onFailure(message)
+                }
             }
         case .unknown:
             print("Unknown status")
