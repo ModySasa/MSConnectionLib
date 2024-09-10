@@ -33,29 +33,6 @@ actor ProductNetworkManager : ProductNetworkManagerProtocol , BaseUrlProviding{
     }
 }
 
-protocol ProductNetworkManagerProtocol {
-    var getProductsUrl: String { get }
-    var singleProductUrl: String { get }
-    func getProductsData() async -> Result<CommonResponse<ProductListResponse>, MultipleDecodingErrors>
-    func getSingleProductsData(id: Int) async -> Result<CommonResponse<ProductResponse>, MultipleDecodingErrors>
-}
 
-extension ProductNetworkManagerProtocol {
-    var getProductsUrl: String { APIs.ProductAPIs.main.url() }
-    var singleProductUrl: String { APIs.ProductAPIs.single.url() }
-}
 
-fileprivate extension APIs {
-    enum ProductAPIs : String {
-        case main = "products"
-        case single = "/"
-        
-        func url() -> String {
-            if( self == .main) {
-                return self.rawValue
-            } else {
-                return APIs.ProductAPIs.main.rawValue + self.rawValue
-            }
-        }
-    }
-}
+

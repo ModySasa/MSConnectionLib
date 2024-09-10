@@ -5,14 +5,7 @@
 //  Created by Moha on 9/4/24.
 //
 
-struct Product: Codable , Equatable , Identifiable , Hashable{
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-    static func == (lhs: Product, rhs: Product) -> Bool {
-        lhs.id == rhs.id
-    }
-    
+struct Product: Codable , Identifiable{
     let id: Int?
     let code: String?
     let link: String?

@@ -55,7 +55,7 @@ class ProductsPagingViewModel: PagingViewModel<Product> {
 //    @Published var pagingViewModel: PagingViewModel<Product> = .init(endPoint: "products" , lang: "en")
     
     init(lang: String) {
-        super.init(endPoint: "products", lang: lang)
+        super.init(endPoint: APIs.ProductAPIs.main.url(), lang: lang)
     }
     
     private var networkManager = ProductNetworkManager()
