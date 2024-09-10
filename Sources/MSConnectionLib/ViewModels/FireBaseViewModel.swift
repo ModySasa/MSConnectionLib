@@ -42,6 +42,7 @@ public class FireBaseViewModel : ObservableObject {
             must_update_ios = fireBaseSettings.must_update
             paymentLiveKey = fireBaseSettings.paymentLiveKey
             paymentTestKey = fireBaseSettings.paymentTestKey
+            URLPrefHelper.shared.setUrls(mainUrl: fireBaseSettings.base_url , testUrl: fireBaseSettings.test_url)
             print("TAG PRINT::: AFTERCONFIG:::MAIN URL ::: \(fireBaseSettings.base_url)")
             print("TAG PRINT::: AFTERCONFIG:::TEST URL ::: \(fireBaseSettings.test_url)")
             afterFetch(snapshot.value as! [String:Any])
