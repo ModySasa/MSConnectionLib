@@ -9,7 +9,7 @@
 public protocol BaseUrlProviding {
     var apiUrl: String { get }
     func getUrl(_ url:String) -> String
-    func imageUrl(_ link: String) -> String
+    func imageUrl(_ link: String , withApi : Bool) -> String
 }
 
 public extension BaseUrlProviding {
