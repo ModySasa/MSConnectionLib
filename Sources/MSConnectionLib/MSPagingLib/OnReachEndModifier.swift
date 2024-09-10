@@ -9,29 +9,36 @@
 import Foundation
 import SwiftUI
 
-public struct OnReachEndModifier: ViewModifier {
-    public init(item: AnyHashable, items: [AnyHashable], action: @escaping () -> Void) {
+public struct OnReachEndModifier<Item : Identifiable & Codable>: ViewModifier {
+    public init(item: Item, viewModel:PagingViewModel<Item>, action: (() -> Void)? = nil) {
         self.item = item
-        self.items = items
+        self.viewModel = viewModel
         self.action = action
     }
     
-    let item: AnyHashable
-    let items: [AnyHashable]
-    let action: () -> Void
+    let item: Item
+    let viewModel: PagingViewModel<Item>
+    let action: (() -> Void)?
     
     public func body(content: Content) -> some View {
         content
             .onAppear {
-                if item == items.last {
-                    action()
+                if let last = viewModel.items.last {
+                    if item.id == last.id {
+                        if let action {
+                            action()
+                        }
+                        Task {
+                            await viewModel.fetchNextPage()
+                        }
+                    }
                 }
             }
     }
 }
 
 public extension View {
-    func onReachEnd<Item: Identifiable & Hashable>(item: Item, in items: [Item], perform action: @escaping () -> Void) -> some View {
-        self.modifier(OnReachEndModifier(item: item, items: items.map { AnyHashable($0) }, action: action))
+    func onReachEnd<Item: Identifiable & Codable>(item: Item, viewModel : PagingViewModel<Item>, perform action: (() -> Void)? = nil) -> some View {
+        self.modifier(OnReachEndModifier(item: item, viewModel: viewModel, action: action))
     }
 }

@@ -15,17 +15,24 @@ public class PagingViewModel<Item: Identifiable & Codable>: ObservableObject {
     
     private var nextPageUrl: String?
     private var isLoading = false
-    private let initialUrl: String
-    private let networkManager: NetworkManager
+    private let endPoint: String
+    private let networkManager: PagingNetworkManager<Item> = .init()
+    private let lang: String
+    private let token: String
     
-    public init(initialUrl: String, networkManager: NetworkManager = NetworkManager()) {
-        self.initialUrl = initialUrl
-        self.networkManager = networkManager
+    public init(endPoint: String , lang : String) {
+        self.endPoint = endPoint
+        self.lang = lang
+        if let tok = URLPrefHelper.shared.getToken() {
+            self.token = tok
+        } else {
+            self.token = ""
+        }
     }
     
     @MainActor
     public func fetchInitialData() async {
-        await loadData(from: initialUrl)
+        await loadData(from: endPoint)
     }
     
     @MainActor
@@ -39,8 +46,7 @@ public class PagingViewModel<Item: Identifiable & Codable>: ObservableObject {
     private func loadData(from url: String) async {
         isLoading = true
         defer { isLoading = false }
-
-        let result = await networkManager.get(from: url, lang: "en" , body: networkManager.optionalBody, responseType: CommonResponse<PaginatedResponse<Item>>.self)
+        let result = await networkManager.getData(url: url, lang: lang, token: token)
         switch result {
         case .success(let response):
             response.handleStatus {

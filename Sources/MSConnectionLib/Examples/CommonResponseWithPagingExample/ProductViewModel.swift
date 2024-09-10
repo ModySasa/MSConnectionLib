@@ -11,16 +11,11 @@ class ProductViewModel: ObservableObject {
     @Published var products: [Product] = []
     @Published var product: Product? = nil
     @Published var errorMessages: [String] = []
-    @Published var pagingViewModel: PagingViewModel<Product> = .init(initialUrl: "https://systemira.online/api/products")
+    @Published var pagingViewModel: PagingViewModel<Product> = .init(endPoint: "products" , lang: "en")
     
     private var networkManager = ProductNetworkManager()
     private var nextPageUrl: String? = nil
     private var isLoading = false
-
-    @MainActor
-    func fetchInitialData() async {
-        await loadData()
-    }
 
     @MainActor
     func fetchSingleProduct(_ id: Int) async {
@@ -42,11 +37,6 @@ class ProductViewModel: ObservableObject {
         }
     }
     
-    @MainActor
-    func fetchNextPage() async {
-        await loadData(false)
-    }
-    
     private func loadData(_ isInitial:Bool = true) async {
         self.product = nil
         if(isInitial) {
@@ -56,13 +46,28 @@ class ProductViewModel: ObservableObject {
         }
         self.products = pagingViewModel.items
     }
+}
+
+class ProductsPagingViewModel: PagingViewModel<Product> {
+//    @Published var products: [Product] = []
+//    @Published var product: Product? = nil
+//    @Published var errorMessages: [String] = []
+//    @Published var pagingViewModel: PagingViewModel<Product> = .init(endPoint: "products" , lang: "en")
     
-    private func handleResponse(_ response: CommonResponse<ProductListResponse>){
-        if let prods = response.data?.data {
-            self.products.append(contentsOf: prods)
-            print("Fetched \(prods.count) products")
-            print("Total Fetched \(self.products.count) products")
+    init(lang: String) {
+        super.init(endPoint: "products", lang: lang)
+    }
+    
+    private var networkManager = ProductNetworkManager()
+    private var nextPageUrl: String? = nil
+    private var isLoading = false
+    
+    private func loadData(_ isInitial:Bool = true) async {
+        if(isInitial) {
+            await fetchInitialData()
+        } else {
+            await fetchNextPage()
         }
-        self.nextPageUrl = response.data?.links?.next
+//        self.products = pagingViewModel.items
     }
 }

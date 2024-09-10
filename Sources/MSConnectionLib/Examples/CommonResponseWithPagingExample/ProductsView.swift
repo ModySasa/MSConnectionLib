@@ -9,11 +9,12 @@ import SwiftUI
 
 struct ProductsView: View {
     @StateObject var productViewModel: ProductViewModel = .init()
+    @StateObject var productPagingViewModel: ProductsPagingViewModel = .init(lang: "en")
     
     var body: some View {
         VStack {
             if let p = productViewModel.product
-                , let productName = p.name{
+                , let productName = p.name {
                 Text(productName)
                     .foregroundStyle(.red)
                     .padding(.bottom , 50)
@@ -22,27 +23,25 @@ struct ProductsView: View {
             }
             ScrollView{
                 LazyVStack(spacing:100) {
-                    ForEach(productViewModel.products, id: \.id) { product in
+                    ForEach(productPagingViewModel.items, id: \.id) { product in
                         ProductRow(product: product)
                             .onTapGesture {
                                 Task{
                                     await productViewModel.fetchSingleProduct(product.id!)
                                 }
                             }
-                            .onReachEnd(item: product, in: productViewModel.pagingViewModel.items) {
-                                Task {
-                                    await productViewModel.fetchNextPage()
-                                }
-                            }
-                            
+                            .onReachEnd(
+                                item: product
+                                , viewModel: productPagingViewModel
+                            )
                     }
                 }
             }
-            
-            
         }
         .task {
-            await productViewModel.fetchInitialData()
+            //TODO : SET THE BASE URL NEEDED
+            URLPrefHelper.shared.setUrls(mainUrl: "https://systemira.online", testUrl: "https://systemira.online")
+            await productPagingViewModel.fetchInitialData()
         }
     }
 }

@@ -29,6 +29,15 @@ public class URLPrefHelper{
             return nil
         }
     }
+    
+    func getToken() -> String? {
+        let defaults = UserDefaults.standard
+        if let stringOne = defaults.string(forKey: "token") {
+            return stringOne
+        } else{
+            return nil
+        }
+    }
 }
 
 public enum URLKeys:String {

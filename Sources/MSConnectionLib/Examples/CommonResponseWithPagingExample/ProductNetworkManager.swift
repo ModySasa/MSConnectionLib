@@ -8,13 +8,13 @@
 
 import Foundation
 
-actor ProductNetworkManager {
+actor ProductNetworkManager : ProductNetworkManagerProtocol , BaseUrlProviding{
     private let networkManager = NetworkManager()
     
-    func getProductsData(from url: String) async -> Result<CommonResponse<ProductListResponse>, MultipleDecodingErrors> {
+    func getProductsData() async -> Result<CommonResponse<ProductListResponse>, MultipleDecodingErrors> {
         let lang = "en"
         return await networkManager.get(
-            from: url,
+            from: getUrl(getProductsUrl),
             lang: lang,
             body: networkManager.optionalBody,
             responseType: CommonResponse<ProductListResponse>.self
@@ -22,7 +22,7 @@ actor ProductNetworkManager {
     }
     
     func getSingleProductsData(id: Int) async -> Result<CommonResponse<ProductResponse>, MultipleDecodingErrors> {
-        let url = "https://systemira.online/api/products/\(id)"
+        let url = getUrl(singleProductUrl) + "\(id)"
         let lang = "en"
         return await networkManager.get(
             from: url,
@@ -30,5 +30,32 @@ actor ProductNetworkManager {
             body: networkManager.optionalBody,
             responseType: CommonResponse<ProductResponse>.self
         )
+    }
+}
+
+protocol ProductNetworkManagerProtocol {
+    var getProductsUrl: String { get }
+    var singleProductUrl: String { get }
+    func getProductsData() async -> Result<CommonResponse<ProductListResponse>, MultipleDecodingErrors>
+    func getSingleProductsData(id: Int) async -> Result<CommonResponse<ProductResponse>, MultipleDecodingErrors>
+}
+
+extension ProductNetworkManagerProtocol {
+    var getProductsUrl: String { APIs.ProductAPIs.main.url() }
+    var singleProductUrl: String { APIs.ProductAPIs.single.url() }
+}
+
+fileprivate extension APIs {
+    enum ProductAPIs : String {
+        case main = "products"
+        case single = "/"
+        
+        func url() -> String {
+            if( self == .main) {
+                return self.rawValue
+            } else {
+                return APIs.ProductAPIs.main.rawValue + self.rawValue
+            }
+        }
     }
 }
