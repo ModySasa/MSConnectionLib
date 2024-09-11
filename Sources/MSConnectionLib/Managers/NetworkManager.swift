@@ -59,7 +59,7 @@ public actor NetworkManager {
             logData(data)
             
             let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
+//            decoder.keyDecodingStrategy = .convertFromSnakeCase
             
             let response = try decoder.decode(T.self, from: data)
             return .success(response)
