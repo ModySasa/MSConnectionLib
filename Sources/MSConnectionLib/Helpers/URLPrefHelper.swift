@@ -21,7 +21,7 @@ public class URLPrefHelper{
         defaults.set(value, forKey: key.rawValue)
     }
     
-    func getUrl(key:URLKeys) -> String? {
+    public func getUrl(key:URLKeys) -> String? {
         let defaults = UserDefaults.standard
         if let stringOne = defaults.string(forKey: key.rawValue) {
             return stringOne
@@ -30,7 +30,7 @@ public class URLPrefHelper{
         }
     }
     
-    func getToken() -> String? {
+    public func getToken() -> String? {
         let defaults = UserDefaults.standard
         if let stringOne = defaults.string(forKey: "token") {
             return stringOne
