@@ -57,8 +57,8 @@ public struct CommonResponse<T: Codable>: Codable {
 
     public func handleStatus(
         onSuccess: @escaping () -> Void,
-        onFailure: @escaping (String) -> Void,
-        onStringStatus: ((String?) -> Void)? = nil
+        onFailure: @escaping (String , ErrorResponse? , [String: [String]]??) -> Void,
+        onStringStatus: ((String? , ErrorResponse? , [String: [String]]??) -> Void)? = nil
     ) {
         switch self.status {
         case .boolean(let value):
@@ -66,13 +66,13 @@ public struct CommonResponse<T: Codable>: Codable {
                 onSuccess()
             } else {
                 if let message = self.message {
-                    onFailure(message)
+                    onFailure(message , error , errors)
                 }
             }
         case .string(let value):
             print("String status: \(value)")
             if let onStringStatus {
-                onStringStatus(value)
+                onStringStatus(value , error , errors)
             }
         case .int(let value):
             print("Integer status: \(value)")
@@ -80,7 +80,7 @@ public struct CommonResponse<T: Codable>: Codable {
                 onSuccess()
             } else {
                 if let message = self.message {
-                    onFailure(message)
+                    onFailure(message , error , errors)
                 }
             }
         case .yesNo(let value):
@@ -89,7 +89,7 @@ public struct CommonResponse<T: Codable>: Codable {
                 onSuccess()
             } else {
                 if let message = self.message {
-                    onFailure(message)
+                    onFailure(message , error , errors)
                 }
             }
         case .oneZero(let value):
@@ -97,13 +97,13 @@ public struct CommonResponse<T: Codable>: Codable {
                 onSuccess()
             } else {
                 if let message = self.message {
-                    onFailure(message)
+                    onFailure(message , error , errors)
                 }
             }
         case .unknown:
             print("Unknown status")
             if let onStringStatus {
-                onStringStatus(self.message)
+                onStringStatus(self.message , error , errors)
             }
         }
     }
