@@ -11,17 +11,58 @@ public struct CommonResponse<T: Codable>: Codable {
     public let status: Status
     public let message: String?
     public let data: T?
+    public let error: ErrorResponse? // Single error string or error object
+    public let errors: [String: [String]]? // Validation errors (map of lists)
+
+    // Custom initializer
+    public init(
+        status: Status,
+        message: String?,
+        data: T?,
+        error: ErrorResponse? = nil,
+        errors: [String: [String]]? = nil
+    ) {
+        self.status = status
+        self.message = message
+        self.data = data
+        self.error = error
+        self.errors = errors
+    }
     
-    public init(status: Status, message: String, data: T?) {
-            self.status = status
-            self.message = message
-            self.data = data
+    // Custom decoding logic to handle error and errors fields dynamically
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        // Decode status
+        self.status = try container.decode(Status.self, forKey: .status)
+        
+        // Decode message
+        self.message = try? container.decode(String.self, forKey: .message)
+        
+        // Decode data
+        self.data = try? container.decode(T.self, forKey: .data)
+        
+        // Handle "error" or "errors" dynamically
+        if let errorString = try? container.decode(String.self, forKey: .error) {
+            self.error = .single(errorString)
+            self.errors = nil
+        } else if let errorsMap = try? container.decode([String: [String]].self, forKey: .errors) {
+            self.error = nil
+            self.errors = errorsMap
+        } else {
+            self.error = nil
+            self.errors = nil
         }
-    
-    public func handleStatus(onSuccess:@escaping ()->Void , onFailure:@escaping (String)->Void , onStringStatus : ((String?)->Void)? = nil) {
+    }
+
+    public func handleStatus(
+        onSuccess: @escaping () -> Void,
+        onFailure: @escaping (String) -> Void,
+        onStringStatus: ((String?) -> Void)? = nil
+    ) {
         switch self.status {
         case .boolean(let value):
-            if(value) {
+            if value {
                 onSuccess()
             } else {
                 if let message = self.message {
@@ -35,7 +76,7 @@ public struct CommonResponse<T: Codable>: Codable {
             }
         case .int(let value):
             print("Integer status: \(value)")
-            if(value == 1) {
+            if value == 1 {
                 onSuccess()
             } else {
                 if let message = self.message {
@@ -44,7 +85,7 @@ public struct CommonResponse<T: Codable>: Codable {
             }
         case .yesNo(let value):
             print("Yes/No status: \(value)")
-            if(value) {
+            if value {
                 onSuccess()
             } else {
                 if let message = self.message {
@@ -52,7 +93,7 @@ public struct CommonResponse<T: Codable>: Codable {
                 }
             }
         case .oneZero(let value):
-            if(value) {
+            if value {
                 onSuccess()
             } else {
                 if let message = self.message {

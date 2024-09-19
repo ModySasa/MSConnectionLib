@@ -16,7 +16,7 @@ public enum Status: Codable {
     case unknown
 
     // Helper initializer to handle the "yes"/"no" and "1"/"0" strings
-    init(fromString value: String) {
+    public init(fromString value: String) {
         switch value.lowercased() {
         case "yes", "1":
             self = .yesNo(true)
@@ -27,7 +27,7 @@ public enum Status: Codable {
         }
     }
 
-    init(fromInt value: Int) {
+    public init(fromInt value: Int) {
         switch value {
         case 1:
             self = .oneZero(true)
