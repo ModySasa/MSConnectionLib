@@ -57,30 +57,40 @@ public struct CommonResponse<T: Codable>: Codable {
 
     public func handleStatus(
         onSuccess: @escaping () -> Void,
-        onFailure: @escaping (String , ErrorResponse? , [String: [String]]??) -> Void,
-        onStringStatus: ((String? , ErrorResponse? , [String: [String]]??) -> Void)? = nil
+        onFailure: ((String) -> Void)? = nil,
+        onStringStatus: ((String?) -> Void)? = nil,
+        handleErrors: ((ErrorResponse? , [String: [String]]??) -> Void)? = nil
     ) {
         switch self.status {
         case .boolean(let value):
             if value {
                 onSuccess()
             } else {
-                if let message = self.message {
-                    onFailure(message , error , errors)
+                if let message = self.message , let onFailure{
+                    onFailure(message)
+                }
+                if let handleErrors {
+                    handleErrors(error , errors)
                 }
             }
         case .string(let value):
             print("String status: \(value)")
             if let onStringStatus {
-                onStringStatus(value , error , errors)
+                onStringStatus(value)
+            }
+            if let handleErrors {
+                handleErrors(error , errors)
             }
         case .int(let value):
             print("Integer status: \(value)")
             if value == 1 {
                 onSuccess()
             } else {
-                if let message = self.message {
-                    onFailure(message , error , errors)
+                if let message = self.message , let onFailure {
+                    onFailure(message)
+                }
+                if let handleErrors {
+                    handleErrors(error , errors)
                 }
             }
         case .yesNo(let value):
@@ -88,22 +98,31 @@ public struct CommonResponse<T: Codable>: Codable {
             if value {
                 onSuccess()
             } else {
-                if let message = self.message {
-                    onFailure(message , error , errors)
+                if let message = self.message , let onFailure {
+                    onFailure(message)
+                }
+                if let handleErrors {
+                    handleErrors(error , errors)
                 }
             }
         case .oneZero(let value):
             if value {
                 onSuccess()
             } else {
-                if let message = self.message {
-                    onFailure(message , error , errors)
+                if let message = self.message , let onFailure {
+                    onFailure(message)
+                }
+                if let handleErrors {
+                    handleErrors(error , errors)
                 }
             }
         case .unknown:
             print("Unknown status")
             if let onStringStatus {
-                onStringStatus(self.message , error , errors)
+                onStringStatus(self.message)
+            }
+            if let handleErrors {
+                handleErrors(error , errors)
             }
         }
     }
