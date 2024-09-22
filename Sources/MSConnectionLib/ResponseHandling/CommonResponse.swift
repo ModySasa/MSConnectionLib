@@ -37,10 +37,10 @@ public struct CommonResponse<T: Codable>: Codable {
         self.status = try container.decode(Status.self, forKey: .status)
         
         // Decode message
-        self.message = try? container.decode(String.self, forKey: .message)
+        self.message = try container.decodeIfPresent(String.self, forKey: .message)
         
         // Decode data
-        self.data = try? container.decode(T.self, forKey: .data)
+        self.data = try container.decodeIfPresent(T.self, forKey: .data)
         
         // Handle "error" or "errors" dynamically
         if let errorString = try? container.decode(String.self, forKey: .error) {
@@ -63,16 +63,7 @@ public struct CommonResponse<T: Codable>: Codable {
     ) {
         switch self.status {
         case .boolean(let value):
-            if value {
-                onSuccess()
-            } else {
-                if let message = self.message , let onFailure{
-                    onFailure(message)
-                }
-                if let handleErrors {
-                    handleErrors(error , errors)
-                }
-            }
+            value ? onSuccess() : handleFailure(message: self.message, onFailure: onFailure, handleErrors: handleErrors)
         case .string(let value):
             print("String status: \(value)")
             if let onStringStatus {
@@ -126,4 +117,17 @@ public struct CommonResponse<T: Codable>: Codable {
             }
         }
     }
+    
+    private func handleFailure(
+         message: String?,
+         onFailure: ((String) -> Void)?,
+         handleErrors: ((ErrorResponse?, [String: [String]]??) -> Void)?
+     ) {
+         if let message = message, let onFailure {
+             onFailure(message)
+         }
+         if let handleErrors {
+             handleErrors(error, errors)
+         }
+     }
 }
