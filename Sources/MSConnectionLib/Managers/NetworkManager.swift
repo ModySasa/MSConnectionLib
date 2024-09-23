@@ -150,6 +150,24 @@ public actor NetworkManager {
         }
     }
     
+    public func fetchImage(from url: String) async throws -> UIImage{
+        do {
+            guard let theUrl = URL(string: url)
+            else {
+                throw URLError.init(.badURL)
+            }
+            
+            let (data , _) = try await URLSession.shared.data(from: theUrl)
+            if let image = UIImage(data: data) {
+                return image
+            } else {
+                throw URLError.init(.badURL)
+            }
+        } catch {
+            throw error
+        }
+    }
+    
     public func uploadImage<T: Decodable>(
         to url: String,
         httpMethod: HTTPMethod = .post,
