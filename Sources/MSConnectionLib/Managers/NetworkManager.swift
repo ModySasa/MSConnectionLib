@@ -156,6 +156,7 @@ public actor NetworkManager {
         lang: String = "en",
         image: UIImage,
         imageName: String,
+        key:String = "image",
         responseType: T.Type,
         token: String? = nil,
         maxSizeInMB : Double = 2
@@ -189,7 +190,7 @@ public actor NetworkManager {
             
             // Append image data
             body.append("--\(boundary)\r\n".data(using: .utf8)!)
-            body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(imageName)\"\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(imageName)\"\r\n".data(using: .utf8)!)
             body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
             body.append(imageData)
             body.append("\r\n".data(using: .utf8)!)
