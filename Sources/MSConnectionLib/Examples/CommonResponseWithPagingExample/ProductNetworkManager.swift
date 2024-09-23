@@ -16,7 +16,7 @@ actor ProductNetworkManager : ProductNetworkManagerProtocol , BaseUrlProviding{
         return await networkManager.get(
             from: getUrl(getProductsUrl),
             lang: lang,
-            body: networkManager.optionalBody,
+            parameters: networkManager.optionalBody,
             responseType: CommonResponse<ProductListResponse>.self
         )
     }
@@ -27,7 +27,7 @@ actor ProductNetworkManager : ProductNetworkManagerProtocol , BaseUrlProviding{
         return await networkManager.get(
             from: url,
             lang: lang,
-            body: networkManager.optionalBody,
+            parameters: networkManager.optionalBody,
             responseType: CommonResponse<ProductResponse>.self
         )
     }

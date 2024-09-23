@@ -13,7 +13,7 @@ actor PostNetworkManager : PostNetworkManagerProtocol , BaseUrlProviding {
 
     func getPostData() async -> Result<[PostModel], MultipleDecodingErrors> {
         let url = apiUrl + getPostUrl
-        return await networkManager.get(from: url, body: Optional<String>.none, responseType: [PostModel].self)
+        return await networkManager.get(from: url, parameters: Optional<String>.none, responseType: [PostModel].self)
     }
 }
 

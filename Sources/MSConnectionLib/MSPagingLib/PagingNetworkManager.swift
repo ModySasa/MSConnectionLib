@@ -18,7 +18,7 @@ actor PagingNetworkManager<Item: Identifiable & Codable> : BaseUrlProviding{
         return await networkManager.get(
             from: theUrl,
             lang: lang,
-            body: networkManager.optionalBody,
+            parameters: networkManager.optionalBody,
             responseType: CommonResponse<PaginatedResponse<Item>>.self,
             token: token
         )
