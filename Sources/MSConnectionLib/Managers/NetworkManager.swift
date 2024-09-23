@@ -13,7 +13,7 @@ public actor NetworkManager {
     let errorLogger: ErrorLogger = .shared
     public let optionalBody = Optional<String>.none
     private let parentClassName: String
-        
+    
     // Updated initializer without directly using 'self'
     public init(T: Any.Type = NetworkManager.self) {
         self.parentClassName = String(describing: T)
@@ -27,13 +27,28 @@ public actor NetworkManager {
     public func get<T: Decodable, U: Encodable>(
         from url: String,
         lang: String = "en",
-        body: U? = nil,
+        parameters: U? = nil,
         responseType: T.Type,
-        token: String? = nil // Added token parameter with default value
+        token: String? = nil
     ) async -> Result<T, MultipleDecodingErrors> {
-        guard let theUrl = URL(string: url) else {
-            return .failure(MultipleDecodingErrors(errors: [.other(URLError.init(.badURL))]))
+        guard var components = URLComponents(string: url) else {
+            return .failure(MultipleDecodingErrors(errors: [.other(URLError(.badURL))]))
         }
+        
+        if let body = parameters {
+            let jsonData = try? JSONEncoder().encode(body)
+            if let jsonData = jsonData,
+               let jsonObject = try? JSONSerialization.jsonObject(with: jsonData, options: []),
+               let parameters = jsonObject as? [String: Any] {
+                
+                components.queryItems = parameters.map { URLQueryItem(name: "\($0)", value: "\($1)") }
+            }
+        }
+        
+        guard let theUrl = components.url else {
+            return .failure(MultipleDecodingErrors(errors: [.other(URLError(.badURL))]))
+        }
+        
         print("urlPrint ::: " , theUrl)
         
         var data: Data = Data() // Initialize data
@@ -45,10 +60,6 @@ public actor NetworkManager {
             request.setValue("application/json", forHTTPHeaderField: "Accept")
             request.setValue(lang, forHTTPHeaderField: "lang")
             
-            if let body {
-                request.httpBody = try JSONEncoder().encode(body)
-            }
-            
             if let token = token {
                 request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
                 request.setValue(token, forHTTPHeaderField: "token")
@@ -59,7 +70,7 @@ public actor NetworkManager {
             logData(data)
             
             let decoder = JSONDecoder()
-//            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            // decoder.keyDecodingStrategy = .convertFromSnakeCase
             
             let response = try decoder.decode(T.self, from: data)
             return .success(response)
@@ -116,7 +127,7 @@ public actor NetworkManager {
             logData(data)
             
             let decoder = JSONDecoder()
-//            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            //            decoder.keyDecodingStrategy = .convertFromSnakeCase
             let response = try decoder.decode(T.self, from: data)
             return .success(response)
         } catch let error as Swift.DecodingError {
