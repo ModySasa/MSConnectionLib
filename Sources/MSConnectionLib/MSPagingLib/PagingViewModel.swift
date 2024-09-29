@@ -9,7 +9,7 @@
 import Foundation
 import SwiftUI
 
-public class PagingViewModel<Item: Identifiable & Codable>: ObservableObject {
+open class PagingViewModel<Item: Identifiable & Codable>: ObservableObject {
     @Published public var items: [Item] = []
     @Published public var errorMessages: [String] = []
     
