@@ -11,7 +11,7 @@ class ProductViewModel: ObservableObject {
     @Published var products: [Product] = []
     @Published var product: Product? = nil
     @Published var errorMessages: [String] = []
-    @Published var pagingViewModel: PagingViewModel<Product> = .init(endPoint: "products" , lang: "en")
+    @Published var pagingViewModel: PagingViewModel<Product , ProductRequest> = .init(endPoint: "products" , lang: "en")
     
     private var networkManager = ProductNetworkManager()
     private var nextPageUrl: String? = nil
@@ -48,14 +48,14 @@ class ProductViewModel: ObservableObject {
     }
 }
 
-class ProductsPagingViewModel: PagingViewModel<Product> {
+class ProductsPagingViewModel: PagingViewModel<Product , ProductRequest> {
 //    @Published var products: [Product] = []
 //    @Published var product: Product? = nil
 //    @Published var errorMessages: [String] = []
 //    @Published var pagingViewModel: PagingViewModel<Product> = .init(endPoint: "products" , lang: "en")
     
-    init(lang: String) {
-        super.init(endPoint: APIs.ProductAPIs.main.url(), lang: lang)
+    init(lang: String , parameters : ProductRequest? = nil) {
+        super.init(endPoint: APIs.ProductAPIs.main.url(), lang: lang , parameters: parameters)
     }
     
     private var networkManager = ProductNetworkManager()
@@ -70,4 +70,8 @@ class ProductsPagingViewModel: PagingViewModel<Product> {
         }
 //        self.products = pagingViewModel.items
     }
+}
+
+public struct ProductRequest : Codable {
+    
 }

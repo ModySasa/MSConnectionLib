@@ -9,7 +9,7 @@
 import Foundation
 import SwiftUI
 
-open class PagingViewModel<Item: Identifiable & Codable>: ObservableObject {
+open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: ObservableObject {
     @Published public var items: [Item] = []
     @Published public var errorMessages: [String] = []
     
@@ -19,8 +19,9 @@ open class PagingViewModel<Item: Identifiable & Codable>: ObservableObject {
     private let networkManager: PagingNetworkManager<Item> = .init()
     private let lang: String
     private let token: String
+    private let parameters : U?
     
-    public init(endPoint: String , lang : String) {
+    public init(endPoint: String , lang : String , parameters: U? = nil) {
         self.endPoint = endPoint
         self.lang = lang
         if let tok = URLPrefHelper.shared.getToken() {
@@ -28,6 +29,7 @@ open class PagingViewModel<Item: Identifiable & Codable>: ObservableObject {
         } else {
             self.token = ""
         }
+        self.parameters = parameters
     }
     
     @MainActor
@@ -46,7 +48,7 @@ open class PagingViewModel<Item: Identifiable & Codable>: ObservableObject {
     private func loadData(from url: String) async {
         isLoading = true
         defer { isLoading = false }
-        let result = await networkManager.getData(url: url, lang: lang, token: token)
+        let result = await networkManager.getData(url: url, lang: lang, token: token , parameters: parameters)
         switch result {
         case .success(let response):
             response.handleStatus {
