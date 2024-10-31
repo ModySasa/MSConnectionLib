@@ -9,7 +9,7 @@
 import Foundation
 import SwiftUI
 
-public struct OnReachEndModifier<Item : Identifiable & Codable , vm: PagingViewModel>: ViewModifier {
+public struct OnReachEndModifier<Item : Identifiable & Codable , vm: PagingViewModel<Codable,Codable>>: ViewModifier {
     public init(item: Item, viewModel:vm, action: (() -> Void)? = nil) {
         self.item = item
         self.viewModel = viewModel
@@ -17,7 +17,7 @@ public struct OnReachEndModifier<Item : Identifiable & Codable , vm: PagingViewM
     }
     
     let item: Item
-    let viewModel: PagingViewModel<Item , ProductRequest>
+    let viewModel: PagingViewModel<Codable,Codable>
     let action: (() -> Void)?
     
     public func body(content: Content) -> some View {
@@ -42,7 +42,7 @@ public extension View {
 //        self.modifier(OnReachEndModifier(item: item, viewModel: viewModel, action: action))
 //    }
     
-    func onReachEnd<Item: Identifiable & Codable , vm: PagingViewModel>(item: Item, viewModel :  vm , perform action: (() -> Void)? = nil) -> some View {
+    func onReachEnd<Item: Identifiable & Codable , vm: PagingViewModel<Codable,Codable>>(item: Item, viewModel :  vm , perform action: (() -> Void)? = nil) -> some View {
             self.modifier(OnReachEndModifier(item: item, viewModel: viewModel, action: action))
         }
 }
