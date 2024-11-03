@@ -50,6 +50,7 @@ public actor NetworkManager {
         }
         
         print("urlPrint ::: " , theUrl)
+        print("urlPrint parameters ::: " , components.queryItems)
         
         var data: Data = Data() // Initialize data
         
