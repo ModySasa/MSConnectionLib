@@ -247,6 +247,93 @@ public actor NetworkManager {
         }
     }
     
+    public func uploadImagesWithBody<T: Decodable, U: Encodable>(
+        to url: String,
+        httpMethod: HTTPMethod = .post,
+        lang: String = "en",
+        images: [UIImage],
+        imagesNames: [String],
+        keys:[String],
+        body: U,
+        responseType: T.Type,
+        token: String? = nil,
+        maxSizeInMB : Double = 2
+    ) async -> Result<T, MultipleDecodingErrors> {
+        let theImages = images.map { compressImage($0, maxSizeInMB: maxSizeInMB) }
+        
+        guard let theUrl = URL(string: url) else {
+            return .failure(MultipleDecodingErrors(errors: [.other(URLError.init(.badURL))]))
+        }
+        
+        var data: Data = Data()
+        do {
+            var request = URLRequest(url: theUrl)
+            request.httpMethod = httpMethod.rawValue
+            
+            let boundary = "Boundary-\(UUID().uuidString)"
+            request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+            request.setValue(lang, forHTTPHeaderField: "lang")
+            request.httpBody = try JSONEncoder().encode(body)
+            
+            if let token = token {
+                request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+                request.setValue(token, forHTTPHeaderField: "token")
+            }
+            
+            // Create multipart form data
+            let imagesData = theImages.map { $0.jpegData(compressionQuality: 0.7) } // Adjust compression quality as needed
+            
+            if (imagesData.count != images.count) {
+                return .failure(MultipleDecodingErrors(errors: [.other(URLError(.cannotCreateFile))]))
+            }
+            
+            var body = Data()
+            
+            // Append image data
+            body.append("--\(boundary)\r\n".data(using: .utf8)!)
+            
+            for i in 0..<images.count {
+                let imageName = imagesNames[i]
+                let key = keys[i]
+                body.append("Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(imageName)\"\r\n".data(using: .utf8)!)
+                body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+                if let imageData = imagesData[i] {
+                    body.append(imageData)
+                }
+                body.append("\r\n".data(using: .utf8)!)
+                // Close boundary
+                body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+            }
+            
+            request.httpBody = body
+            
+            (data, _) = try await URLSession.shared.data(for: request)
+            
+            logData(data)
+            
+            let decoder = JSONDecoder()
+            let response = try decoder.decode(T.self, from: data)
+            
+            return .success(response)
+            
+        } catch let error as Swift.DecodingError {
+            var decodingErrors: [DecodingError] = []
+            switch error {
+            case .keyNotFound(let key, _):
+                decodingErrors.append(.missingKey(key.stringValue))
+            case .typeMismatch(_, let context):
+                decodingErrors.append(.typeMismatch(context.codingPath.map { $0.stringValue }.joined(separator: "."), expectedType: context.debugDescription))
+            default:
+                decodingErrors.append(.other(error))
+            }
+            logDecodingError(error, data: data)
+            return .failure(MultipleDecodingErrors(errors: decodingErrors))
+        } catch {
+            logError(error)
+            return .failure(MultipleDecodingErrors(errors: [.other(error)]))
+        }
+    }
+    
     private func logDecodingError(
         _ error: Swift.DecodingError,
         data: Data
