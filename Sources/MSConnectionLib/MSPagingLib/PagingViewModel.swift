@@ -19,7 +19,7 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: Observab
     private let networkManager: PagingNetworkManager<Item> = .init()
     private let lang: String
     private let token: String
-    private let parameters : U?
+    private var parameters : U?
     
     public init(endPoint: String , lang : String , parameters: U? = nil) {
         self.endPoint = endPoint
