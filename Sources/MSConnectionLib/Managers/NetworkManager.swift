@@ -247,6 +247,102 @@ public actor NetworkManager {
         }
     }
     
+    public func uploadImagesWithBody<T: Decodable, U: Encodable>(
+        to url: String,
+        httpMethod: HTTPMethod = .post,
+        lang: String = "en",
+        images: [UIImage],
+        imagesNames: [String],
+        keys: [String],
+        body: U,
+        responseType: T.Type,
+        token: String? = nil,
+        maxSizeInMB: Double = 2
+    ) async -> Result<T, MultipleDecodingErrors> {
+        let theImages = images.map { compressImage($0, maxSizeInMB: maxSizeInMB) }
+        
+        guard let theUrl = URL(string: url) else {
+            return .failure(MultipleDecodingErrors(errors: [.other(URLError(.badURL))]))
+        }
+        
+        var data: Data = Data()
+        do {
+            var request = URLRequest(url: theUrl)
+            request.httpMethod = httpMethod.rawValue
+            
+            let boundary = "Boundary-\(UUID().uuidString)"
+            request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+            request.setValue(lang, forHTTPHeaderField: "lang")
+            
+            if let token = token {
+                request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+                request.setValue(token, forHTTPHeaderField: "token")
+            }
+            
+            // Start building multipart body
+            var bodyData = Data()
+            
+            // Convert `body` to a dictionary and append each field individually
+            let bodyDict = try body.toDictionary()
+            for (key, value) in bodyDict {
+                bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
+                bodyData.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
+                bodyData.append("\(value)\r\n".data(using: .utf8)!)
+            }
+            
+            // Append image data
+            let imagesData = theImages.map { $0.jpegData(compressionQuality: 0.7) }
+            
+            if imagesData.count != images.count {
+                return .failure(MultipleDecodingErrors(errors: [.other(URLError(.cannotCreateFile))]))
+            }
+            
+            for i in 0..<images.count {
+                let imageName = imagesNames[i]
+                let key = keys[i]
+                bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
+                bodyData.append("Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(imageName)\"\r\n".data(using: .utf8)!)
+                bodyData.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+                if let imageData = imagesData[i] {
+                    bodyData.append(imageData)
+                }
+                bodyData.append("\r\n".data(using: .utf8)!)
+            }
+            
+            // End boundary
+            bodyData.append("--\(boundary)--\r\n".data(using: .utf8)!)
+            
+            // Set the multipart form data as the request body
+            request.httpBody = bodyData
+            
+            // Perform the request
+            (data, _) = try await URLSession.shared.data(for: request)
+            
+            logData(data)
+            
+            let decoder = JSONDecoder()
+            let response = try decoder.decode(T.self, from: data)
+            
+            return .success(response)
+            
+        } catch let error as Swift.DecodingError {
+            var decodingErrors: [DecodingError] = []
+            switch error {
+            case .keyNotFound(let key, _):
+                decodingErrors.append(.missingKey(key.stringValue))
+            case .typeMismatch(_, let context):
+                decodingErrors.append(.typeMismatch(context.codingPath.map { $0.stringValue }.joined(separator: "."), expectedType: context.debugDescription))
+            default:
+                decodingErrors.append(.other(error))
+            }
+            logDecodingError(error, data: data)
+            return .failure(MultipleDecodingErrors(errors: decodingErrors))
+        } catch {
+            logError(error)
+            return .failure(MultipleDecodingErrors(errors: [.other(error)]))
+        }
+    }
+    
     private func logDecodingError(
         _ error: Swift.DecodingError,
         data: Data
@@ -310,4 +406,12 @@ public enum HTTPMethod: String {
     case delete = "DELETE"
     case patch = "PATCH"
     // Add other methods as needed
+}
+
+public extension Encodable {
+    func toDictionary() throws -> [String: Any] {
+        let data = try JSONEncoder().encode(self)
+        let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
+        return jsonObject as? [String: Any] ?? [:]
+    }
 }
