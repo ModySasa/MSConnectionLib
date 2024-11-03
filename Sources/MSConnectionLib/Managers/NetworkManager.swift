@@ -253,11 +253,11 @@ public actor NetworkManager {
         lang: String = "en",
         images: [UIImage],
         imagesNames: [String],
-        keys:[String],
+        keys: [String],
         body: U,
         responseType: T.Type,
         token: String? = nil,
-        maxSizeInMB : Double = 2
+        maxSizeInMB: Double = 2
     ) async -> Result<T, MultipleDecodingErrors> {
         let theImages = images.map { compressImage($0, maxSizeInMB: maxSizeInMB) }
         
@@ -282,13 +282,13 @@ public actor NetworkManager {
             // Start building multipart body
             var bodyData = Data()
             
-            // Append JSON body as a form-data part
-            let jsonData = try JSONEncoder().encode(body)
-            bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
-            bodyData.append("Content-Disposition: form-data; name=\"jsonBody\"\r\n".data(using: .utf8)!)
-            bodyData.append("Content-Type: application/json\r\n\r\n".data(using: .utf8)!)
-            bodyData.append(jsonData)
-            bodyData.append("\r\n".data(using: .utf8)!)
+            // Convert `body` to a dictionary and append each field individually
+            let bodyDict = try body.toDictionary()
+            for (key, value) in bodyDict {
+                bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
+                bodyData.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
+                bodyData.append("\(value)\r\n".data(using: .utf8)!)
+            }
             
             // Append image data
             let imagesData = theImages.map { $0.jpegData(compressionQuality: 0.7) }
@@ -406,4 +406,12 @@ public enum HTTPMethod: String {
     case delete = "DELETE"
     case patch = "PATCH"
     // Add other methods as needed
+}
+
+public extension Encodable {
+    func toDictionary() throws -> [String: Any] {
+        let data = try JSONEncoder().encode(self)
+        let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
+        return jsonObject as? [String: Any] ?? [:]
+    }
 }
