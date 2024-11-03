@@ -262,7 +262,7 @@ public actor NetworkManager {
         let theImages = images.map { compressImage($0, maxSizeInMB: maxSizeInMB) }
         
         guard let theUrl = URL(string: url) else {
-            return .failure(MultipleDecodingErrors(errors: [.other(URLError.init(.badURL))]))
+            return .failure(MultipleDecodingErrors(errors: [.other(URLError(.badURL))]))
         }
         
         var data: Data = Data()
@@ -273,40 +273,49 @@ public actor NetworkManager {
             let boundary = "Boundary-\(UUID().uuidString)"
             request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
             request.setValue(lang, forHTTPHeaderField: "lang")
-            request.httpBody = try JSONEncoder().encode(body)
             
             if let token = token {
                 request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
                 request.setValue(token, forHTTPHeaderField: "token")
             }
             
-            // Create multipart form data
-            let imagesData = theImages.map { $0.jpegData(compressionQuality: 0.7) } // Adjust compression quality as needed
+            // Start building multipart body
+            var bodyData = Data()
             
-            if (imagesData.count != images.count) {
-                return .failure(MultipleDecodingErrors(errors: [.other(URLError(.cannotCreateFile))]))
-            }
-            
-            var body = Data()
+            // Append JSON body as a form-data part
+            let jsonData = try JSONEncoder().encode(body)
+            bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
+            bodyData.append("Content-Disposition: form-data; name=\"jsonBody\"\r\n".data(using: .utf8)!)
+            bodyData.append("Content-Type: application/json\r\n\r\n".data(using: .utf8)!)
+            bodyData.append(jsonData)
+            bodyData.append("\r\n".data(using: .utf8)!)
             
             // Append image data
-            body.append("--\(boundary)\r\n".data(using: .utf8)!)
+            let imagesData = theImages.map { $0.jpegData(compressionQuality: 0.7) }
+            
+            if imagesData.count != images.count {
+                return .failure(MultipleDecodingErrors(errors: [.other(URLError(.cannotCreateFile))]))
+            }
             
             for i in 0..<images.count {
                 let imageName = imagesNames[i]
                 let key = keys[i]
-                body.append("Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(imageName)\"\r\n".data(using: .utf8)!)
-                body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+                bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
+                bodyData.append("Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(imageName)\"\r\n".data(using: .utf8)!)
+                bodyData.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
                 if let imageData = imagesData[i] {
-                    body.append(imageData)
+                    bodyData.append(imageData)
                 }
-                body.append("\r\n".data(using: .utf8)!)
-                // Close boundary
-                body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+                bodyData.append("\r\n".data(using: .utf8)!)
             }
             
-            request.httpBody = body
+            // End boundary
+            bodyData.append("--\(boundary)--\r\n".data(using: .utf8)!)
             
+            // Set the multipart form data as the request body
+            request.httpBody = bodyData
+            
+            // Perform the request
             (data, _) = try await URLSession.shared.data(for: request)
             
             logData(data)
