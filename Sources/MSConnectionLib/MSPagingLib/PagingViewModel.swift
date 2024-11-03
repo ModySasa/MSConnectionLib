@@ -46,6 +46,7 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: Observab
         await loadData(from: nextPageUrl)
     }
     
+    @MainActor
     private func loadData(from url: String) async {
         isLoading = true
         defer { isLoading = false }
