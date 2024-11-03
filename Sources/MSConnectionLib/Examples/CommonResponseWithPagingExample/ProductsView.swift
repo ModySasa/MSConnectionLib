@@ -41,7 +41,7 @@ struct ProductsView: View {
         .task {
             //TODO : SET THE BASE URL NEEDED
             URLPrefHelper.shared.setUrls(mainUrl: "https://systemira.online", testUrl: "https://systemira.online")
-            await productPagingViewModel.fetchInitialData()
+            await productPagingViewModel.fetchInitialData(parameters: ProductRequest())
         }
     }
 }
