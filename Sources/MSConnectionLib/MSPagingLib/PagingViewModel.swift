@@ -34,6 +34,7 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: Observab
     
     @MainActor
     public func fetchInitialData(parameters: Codable?) async {
+        self.parameters = parameters
         await loadData(from: endPoint)
     }
     
