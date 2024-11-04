@@ -19,7 +19,7 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: Observab
     private let networkManager: PagingNetworkManager<Item> = .init()
     private let lang: String
     private let token: String
-    private let parameters : U?
+    private var parameters : U?
     
     public init(endPoint: String , lang : String , parameters: U? = nil) {
         self.endPoint = endPoint
@@ -33,7 +33,8 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: Observab
     }
     
     @MainActor
-    public func fetchInitialData() async {
+    public func fetchInitialData(parameters: U?) async {
+        self.parameters = parameters
         await loadData(from: endPoint)
     }
     
@@ -45,6 +46,7 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: Observab
         await loadData(from: nextPageUrl)
     }
     
+    @MainActor
     private func loadData(from url: String) async {
         isLoading = true
         defer { isLoading = false }

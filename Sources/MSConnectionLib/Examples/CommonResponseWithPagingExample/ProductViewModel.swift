@@ -40,7 +40,7 @@ class ProductViewModel: ObservableObject {
     private func loadData(_ isInitial:Bool = true) async {
         self.product = nil
         if(isInitial) {
-            await pagingViewModel.fetchInitialData()
+            await pagingViewModel.fetchInitialData(parameters: ProductRequest())
         } else {
             await pagingViewModel.fetchNextPage()
         }
@@ -64,7 +64,7 @@ class ProductsPagingViewModel: PagingViewModel<Product , ProductRequest> {
     
     private func loadData(_ isInitial:Bool = true) async {
         if(isInitial) {
-            await fetchInitialData()
+            await fetchInitialData(parameters: ProductRequest())
         } else {
             await fetchNextPage()
         }
