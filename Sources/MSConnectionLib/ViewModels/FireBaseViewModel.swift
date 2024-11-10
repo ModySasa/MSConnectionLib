@@ -57,7 +57,10 @@ public class FireBaseViewModel : ObservableObject {
 
     func setAppVersion(){
         currentVerion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
-        currentVersionNumber = Double.init(currentVerion)!
+        if let currentVerionNum = Double.init(currentVerion){
+            currentVersionNumber = currentVerionNum
+        }
+        
     }
     
     public func isNewerVersion(_ version : String) -> Bool {
