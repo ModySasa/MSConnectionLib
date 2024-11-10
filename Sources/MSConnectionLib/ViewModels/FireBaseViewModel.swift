@@ -20,6 +20,7 @@ public class FireBaseViewModel : ObservableObject {
     let settings = RemoteConfigSettings()
     var ref: DatabaseReference!
     @Published public var appVersion : Double = 1
+    @Published public var appVersionString : String = "1"
     @Published public var currentVerion = ""
     @Published public var currentVersionNumber : Double = 0
     @Published public var must_update_ios = false
@@ -59,6 +60,15 @@ public class FireBaseViewModel : ObservableObject {
         currentVersionNumber = Double.init(currentVerion)!
     }
     
+    public func isNewerVersion(_ version : String) -> Bool {
+        let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
+        print("VERSION ::: \(currentVersion)")
+        
+        let isNewerVersion = currentVersion.compare(version, options: .numeric) == .orderedDescending
+        print("Is newer version: \(isNewerVersion)")
+        return isNewerVersion
+    }
+    
     func setRemoteConfig(_ action : Selector ,_ target : UIViewController){
         remoteConfig = RemoteConfig.remoteConfig()
         settings.minimumFetchInterval = 0
@@ -75,6 +85,7 @@ public class FireBaseViewModel : ObservableObject {
                     mainUrl = remoteConfig.getStringVal(.app_url)
                     testUrl = remoteConfig.getStringVal(.test_url)
                     appVersion = remoteConfig.getDoubleVal(.version)
+                    appVersionString = remoteConfig.getStringVal(.version)
                     must_update_ios = remoteConfig.getBoolVal(.mustUpdate)
                     target.perform(action)
                 }
@@ -111,16 +122,18 @@ extension RemoteConfig {
 }
 
 class FirebaseSettings{
-    var base_url = ""
+    var base_url = "https://sonqr.com"
     var must_update = true
-    var test_url = ""
+    var test_url = "https://sonqr.xyz"
     var ios_store_version = 0.001
+    var ios_store_versionString = "0.001"
     var paymentLiveKey = ""
     var paymentTestKey = ""
     
     init(_ data: [String:Any]) {
         base_url = HandlingData.shared.getString(data: data, dataName: "main_url")
         ios_store_version = HandlingData.shared.getDouble(data: data, dataName: "store_version_ios")
+        ios_store_versionString = HandlingData.shared.getString(data: data, dataName: "store_version_ios")
         must_update = HandlingData.shared.getBool(data: data as [String:AnyObject], dataName: "must_update_ios")
         test_url = HandlingData.shared.getString(data: data, dataName: "test_url")
         paymentLiveKey = HandlingData.shared.getString(data: data, dataName: "payment_live_key")
