@@ -30,6 +30,7 @@ public actor NetworkManager {
         parameters: U? = nil,
         responseType: T.Type,
         token: String? = nil
+        , shouldDumpRequest : Bool = false
     ) async -> Result<T, MultipleDecodingErrors> {
         guard var components = URLComponents(string: url) else {
             return .failure(MultipleDecodingErrors(errors: [.other(URLError(.badURL))]))
@@ -65,6 +66,14 @@ public actor NetworkManager {
                 request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
                 request.setValue(token, forHTTPHeaderField: "token")
             }
+            
+            #if DEBUG
+            if(shouldDumpRequest) {
+                dump(request)
+            }
+            #else
+            
+            #endif
             
             (data, _) = try await URLSession.shared.data(for: request)
             
@@ -103,6 +112,7 @@ public actor NetworkManager {
         body: U,
         responseType: T.Type,
         token: String? = nil // Added token parameter with default value
+        , shouldDumpRequest : Bool = false
     ) async -> Result<T, MultipleDecodingErrors> {
         guard let theUrl = URL(string: url) else {
             return .failure(MultipleDecodingErrors(errors: [.other(URLError.init(.badURL))]))
@@ -123,6 +133,13 @@ public actor NetworkManager {
                 request.setValue(token, forHTTPHeaderField: "token")
             }
             
+            #if DEBUG
+            if(shouldDumpRequest) {
+                dump(request)
+            }
+            #else
+            
+            #endif
             (data, _) = try await URLSession.shared.data(for: request)
             
             logData(data)
