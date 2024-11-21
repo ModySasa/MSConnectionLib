@@ -283,6 +283,8 @@ public actor NetworkManager {
             return .failure(MultipleDecodingErrors(errors: [.other(URLError(.badURL))]))
         }
         
+        print("urlPrint ::: " , theUrl)
+        
         var data: Data = Data()
         do {
             var request = URLRequest(url: theUrl)
@@ -308,6 +310,7 @@ public actor NetworkManager {
                 bodyData.append("\(value)\r\n".data(using: .utf8)!)
             }
             
+            print("urlPrint parameters ::: " , bodyData)
             // Append image data
             let imagesData = theImages.map { $0.jpegData(compressionQuality: 0.7) }
             
