@@ -128,6 +128,7 @@ public actor NetworkManager {
             request.setValue(lang, forHTTPHeaderField: "lang")
             request.httpBody = try JSONEncoder().encode(body)
             
+            print("````` body : \(request.httpBody)")
             if let token = token {
                 request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
                 request.setValue(token, forHTTPHeaderField: "token")
