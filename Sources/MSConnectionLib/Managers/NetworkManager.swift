@@ -118,7 +118,7 @@ public actor NetworkManager {
             return .failure(MultipleDecodingErrors(errors: [.other(URLError.init(.badURL))]))
         }
         print("URL IS : " , theUrl)
-        
+        print("`````` body before : \(body)")
         var data: Data = Data() // Initialize data
         do {
             var request = URLRequest(url: theUrl)
