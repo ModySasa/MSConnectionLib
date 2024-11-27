@@ -118,7 +118,6 @@ public actor NetworkManager {
             return .failure(MultipleDecodingErrors(errors: [.other(URLError.init(.badURL))]))
         }
         print("URL IS : " , theUrl)
-        print("`````` body before : \(body)")
         var data: Data = Data() // Initialize data
         do {
             var request = URLRequest(url: theUrl)
@@ -127,8 +126,6 @@ public actor NetworkManager {
             request.setValue("application/json", forHTTPHeaderField: "Accept")
             request.setValue(lang, forHTTPHeaderField: "lang")
             request.httpBody = try JSONEncoder().encode(body)
-            
-            print("````` body : \(request.httpBody)")
             
             print("Encoded body: \(String(data: request.httpBody ?? Data(), encoding: .utf8) ?? "")")
 
