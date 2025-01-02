@@ -118,7 +118,6 @@ public actor NetworkManager {
             return .failure(MultipleDecodingErrors(errors: [.other(URLError.init(.badURL))]))
         }
         print("URL IS : " , theUrl)
-        
         var data: Data = Data() // Initialize data
         do {
             var request = URLRequest(url: theUrl)
@@ -128,6 +127,8 @@ public actor NetworkManager {
             request.setValue(lang, forHTTPHeaderField: "lang")
             request.httpBody = try JSONEncoder().encode(body)
             
+            print("Encoded body: \(String(data: request.httpBody ?? Data(), encoding: .utf8) ?? "")")
+
             if let token = token {
                 request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
                 request.setValue(token, forHTTPHeaderField: "token")
@@ -283,6 +284,8 @@ public actor NetworkManager {
             return .failure(MultipleDecodingErrors(errors: [.other(URLError(.badURL))]))
         }
         
+        print("urlPrint ::: " , theUrl)
+        
         var data: Data = Data()
         do {
             var request = URLRequest(url: theUrl)
@@ -314,6 +317,7 @@ public actor NetworkManager {
                 }
             }
             
+            print("urlPrint parameters ::: " , bodyData)
             // Append image data
             let imagesData = theImages.map { $0.jpegData(compressionQuality: 0.7) }
             
