@@ -307,10 +307,12 @@ public actor NetworkManager {
             let bodyDict = try body.toDictionary()
             for (key, value) in bodyDict {
                 bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
-                if let arrayValue = value as? [Any] {
-                    let arrayString = arrayValue.map { "\($0)" }.joined(separator: ",")
-                    bodyData.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
-                    bodyData.append("\(arrayString)\r\n".data(using: .utf8)!)
+                if let arrayValue = value as? [Int] {
+                    dump(arrayValue)
+                    for arrayItem in arrayValue {
+                        bodyData.append("Content-Disposition: form-data; name=\"\(key)[]\"\r\n\r\n".data(using: .utf8)!)
+                        bodyData.append("\(arrayItem)\r\n".data(using: .utf8)!)
+                    }
                 } else {
                     bodyData.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
                     bodyData.append("\(value)\r\n".data(using: .utf8)!)
@@ -440,7 +442,7 @@ public enum HTTPMethod: String {
 public extension Encodable {
     func toDictionary() throws -> [String: Any] {
         let data = try JSONEncoder().encode(self)
-        let jsonObject = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+        let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
         return jsonObject as? [String: Any] ?? [:]
     }
 }
