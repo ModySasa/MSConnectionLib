@@ -317,7 +317,8 @@ public actor NetworkManager {
                 }
             }
             
-            print("urlPrint parameters ::: " , bodyData)
+            print("Multipart Body Data: \(String(data: bodyData, encoding: .utf8) ?? "")")
+            
             // Append image data
             let imagesData = theImages.map { $0.jpegData(compressionQuality: 0.7) }
             
@@ -439,7 +440,7 @@ public enum HTTPMethod: String {
 public extension Encodable {
     func toDictionary() throws -> [String: Any] {
         let data = try JSONEncoder().encode(self)
-        let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
+        let jsonObject = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
         return jsonObject as? [String: Any] ?? [:]
     }
 }
