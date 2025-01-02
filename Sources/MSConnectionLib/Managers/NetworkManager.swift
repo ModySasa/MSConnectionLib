@@ -304,8 +304,14 @@ public actor NetworkManager {
             let bodyDict = try body.toDictionary()
             for (key, value) in bodyDict {
                 bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
-                bodyData.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
-                bodyData.append("\(value)\r\n".data(using: .utf8)!)
+                if let arrayValue = value as? [Any] {
+                    let arrayString = arrayValue.map { "\($0)" }.joined(separator: ",")
+                    bodyData.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
+                    bodyData.append("\(arrayString)\r\n".data(using: .utf8)!)
+                } else {
+                    bodyData.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
+                    bodyData.append("\(value)\r\n".data(using: .utf8)!)
+                }
             }
             
             // Append image data
