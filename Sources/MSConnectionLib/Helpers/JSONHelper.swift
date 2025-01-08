@@ -12,7 +12,7 @@ public class JSONHelper {
         if let jsonData = jsonString.data(using: .utf8) {
             do {
                 let decoder = JSONDecoder()
-                decoder.keyDecodingStrategy = .convertFromSnakeCase
+//                decoder.keyDecodingStrategy = .convertFromSnakeCase
                 let object = try decoder.decode(Object.self, from: jsonData)
                 return object
             } catch {
