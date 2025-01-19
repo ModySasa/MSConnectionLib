@@ -65,6 +65,7 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: Observab
                 self.errorMessages.append(message)
             } onStringStatus: { st in
                 if let st = st, st == "success" {
+                    self.fullResponse = response.data
                     if let newItems = response.data?.data {
                         self.items.append(contentsOf: newItems)
                     }
