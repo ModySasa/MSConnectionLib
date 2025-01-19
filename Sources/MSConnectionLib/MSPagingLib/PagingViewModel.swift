@@ -40,11 +40,9 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: Observab
     
     @MainActor
     public func fetchNextPage() async {
-        print("````````` fetch next  url \(nextPageUrl)   ,  isLoading : \(isLoading)")
         guard let nextPageUrl = nextPageUrl, !isLoading else {
             return
         }
-        print("````````` after `````nextPageUrl \(nextPageUrl)")
         await loadData(from: nextPageUrl)
     }
     
@@ -52,6 +50,7 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: Observab
     private func loadData(from url: String) async {
         isLoading = true
         defer { isLoading = false }
+        print("````````````` loading data from \(url)")
         let result = await networkManager.getData(url: url, lang: lang, token: token , parameters: parameters)
         switch result {
         case .success(let response):
