@@ -40,6 +40,7 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: Observab
     
     @MainActor
     public func fetchNextPage() async {
+        print("````````` fetch next  url \(nextPageUrl)   ,  isLoading : \(isLoading)")
         guard let nextPageUrl = nextPageUrl, !isLoading else {
             return
         }
@@ -66,6 +67,7 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: Observab
                         self.items.append(contentsOf: newItems)
                     }
                     self.nextPageUrl = response.data?.links?.next
+                    print("````` nextp page url  \(String(describing: self.nextPageUrl))")
                 }
             }
         case .failure(let error):
