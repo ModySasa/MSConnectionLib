@@ -9,13 +9,15 @@
 import Foundation
 import SwiftUI
 
-open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: ObservableObject {
+open class PagingViewModel<Item: Identifiable & Codable , U : Codable , Result : Codable>: ObservableObject {
     @Published public var items: [Item] = []
     @Published public var errorMessages: [String] = []
+    @Published public var result : Result? = nil
+    
     private var nextPageUrl: String?
     private var isLoading = false
     private let endPoint: String
-    private let networkManager: PagingNetworkManager<Item> = .init()
+    private let networkManager: PagingNetworkManager<Item , Result> = .init()
     private let lang: String
     private let token: String
     private var parameters : U?
@@ -57,6 +59,7 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: Observab
                 if let newItems = response.data?.data {
                     self.items.append(contentsOf: newItems)
                 }
+                self.result = response.data?.additionalData
                 self.nextPageUrl = response.data?.links?.next
             } onFailure: { message in
                 self.errorMessages.append(message)
@@ -65,6 +68,7 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: Observab
                     if let newItems = response.data?.data {
                         self.items.append(contentsOf: newItems)
                     }
+                    self.result = response.data?.additionalData
                     self.nextPageUrl = response.data?.links?.next
                 }
             }

@@ -8,7 +8,7 @@
 
 extension APIs {
     enum ProductAPIs : String {
-        case main = "products"
+        case main = "home"
         case single = "/"
         
         func url() -> String {

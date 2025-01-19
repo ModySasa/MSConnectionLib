@@ -5,10 +5,10 @@
 //  Created by Moha on 9/11/24.
 //
 
-actor PagingNetworkManager<Item: Identifiable & Codable> : BaseUrlProviding{
+actor PagingNetworkManager<Item: Identifiable & Codable , R: Codable> : BaseUrlProviding{
     private let networkManager = NetworkManager()
     
-    func getData<U:Encodable>(url: String , lang:String , token:String , parameters: U? = nil) async -> Result<CommonResponse<PaginatedResponse<Item>>, MultipleDecodingErrors> {
+    func getData<U:Encodable>(url: String , lang:String , token:String , parameters: U? = nil) async -> Result<CommonResponse<PaginatedResponse<Item , R>>, MultipleDecodingErrors> {
         let theUrl = if (url.matches("^https?://")) {
             url
         } else {
@@ -19,7 +19,7 @@ actor PagingNetworkManager<Item: Identifiable & Codable> : BaseUrlProviding{
                 from: theUrl,
                 lang: lang,
                 parameters: parameters,
-                responseType: CommonResponse<PaginatedResponse<Item>>.self,
+                responseType: CommonResponse<PaginatedResponse<Item , R>>.self,
                 token: token
             )
         } else {
@@ -27,7 +27,7 @@ actor PagingNetworkManager<Item: Identifiable & Codable> : BaseUrlProviding{
                 from: theUrl,
                 lang: lang,
                 parameters: networkManager.optionalBody,
-                responseType: CommonResponse<PaginatedResponse<Item>>.self,
+                responseType: CommonResponse<PaginatedResponse<Item , R>>.self,
                 token: token
             )
         }

@@ -10,6 +10,7 @@ import SwiftUI
 struct ProductsView: View {
     @StateObject var productViewModel: ProductViewModel = .init()
     @StateObject var productPagingViewModel: ProductsPagingViewModel = .init(lang: "en")
+    @AppStorage("token") var token : String?
     
     var body: some View {
         VStack {
@@ -40,7 +41,8 @@ struct ProductsView: View {
         }
         .task {
             //TODO : SET THE BASE URL NEEDED
-            URLPrefHelper.shared.setUrls(mainUrl: "https://systemira.online", testUrl: "https://systemira.online")
+            URLPrefHelper.shared.setUrls(mainUrl: "https://freshzone.manfazy.com", testUrl: "https://freshzone.manfazy.com")
+            token = "73|6lrbq7MXMdal3TR182Nyr1iVH1VTYQ7DMkWawew07769fc4c"
             await productPagingViewModel.fetchInitialData(parameters: ProductRequest())
         }
     }
