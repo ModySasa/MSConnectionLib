@@ -44,6 +44,7 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: Observab
         guard let nextPageUrl = nextPageUrl, !isLoading else {
             return
         }
+        print("````````` after `````nextPageUrl \(nextPageUrl)")
         await loadData(from: nextPageUrl)
     }
     
@@ -67,7 +68,6 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: Observab
                         self.items.append(contentsOf: newItems)
                     }
                     self.nextPageUrl = response.data?.links?.next
-                    print("````` nextp page url  \(String(describing: self.nextPageUrl))")
                 }
             }
         case .failure(let error):
