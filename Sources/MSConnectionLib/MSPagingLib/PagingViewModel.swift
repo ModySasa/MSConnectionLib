@@ -12,8 +12,6 @@ import SwiftUI
 open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: ObservableObject {
     @Published public var items: [Item] = []
     @Published public var errorMessages: [String] = []
-    @Published public var fullResponse : Codable? = nil
-    
     private var nextPageUrl: String?
     private var isLoading = false
     private let endPoint: String
@@ -51,7 +49,7 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: Observab
     private func loadData(from url: String) async {
         isLoading = true
         defer { isLoading = false }
-        
+
         let result = await networkManager.getData(url: url, lang: lang, token: token , parameters: parameters)
         switch result {
         case .success(let response):
@@ -60,12 +58,10 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: Observab
                     self.items.append(contentsOf: newItems)
                 }
                 self.nextPageUrl = response.data?.links?.next
-                self.fullResponse = response
             } onFailure: { message in
                 self.errorMessages.append(message)
             } onStringStatus: { st in
                 if let st = st, st == "success" {
-                    self.fullResponse = response
                     if let newItems = response.data?.data {
                         self.items.append(contentsOf: newItems)
                     }
