@@ -43,15 +43,12 @@ public actor NetworkManager {
                let jsonObject = try? JSONSerialization.jsonObject(with: jsonData, options: []),
                let parameters = jsonObject as? [String: Any] {
                 
-                // Step 1: Get existing query items (if any)
-                       var existingQueryItems = components.queryItems ?? []
-                       
-                       // Step 2: Convert parameters to URLQueryItem and append to existing query items
-                       let newQueryItems = parameters.map { URLQueryItem(name: "\($0)", value: "\($1)") }
-                       existingQueryItems.append(contentsOf: newQueryItems)
-                       
-                       // Step 3: Set the merged query items back to components
-                       components.queryItems = existingQueryItems
+                var existingQueryItems = components.queryItems ?? []
+                
+                let newQueryItems = parameters.map { URLQueryItem(name: "\($0)", value: "\($1)") }
+                existingQueryItems.append(contentsOf: newQueryItems)
+                
+                components.queryItems = existingQueryItems
             }
         }
         
@@ -78,13 +75,13 @@ public actor NetworkManager {
                 request.setValue(token, forHTTPHeaderField: "token")
             }
             
-            #if DEBUG
+#if DEBUG
             if(shouldDumpRequest) {
                 dump(request)
             }
-            #else
+#else
             
-            #endif
+#endif
             
             (data, _) = try await URLSession.shared.data(for: request)
             
@@ -139,19 +136,19 @@ public actor NetworkManager {
             request.httpBody = try JSONEncoder().encode(body)
             
             print("Encoded body: \(String(data: request.httpBody ?? Data(), encoding: .utf8) ?? "")")
-
+            
             if let token = token {
                 request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
                 request.setValue(token, forHTTPHeaderField: "token")
             }
             
-            #if DEBUG
+#if DEBUG
             if(shouldDumpRequest) {
                 dump(request)
             }
-            #else
+#else
             
-            #endif
+#endif
             (data, _) = try await URLSession.shared.data(for: request)
             
             logData(data)
