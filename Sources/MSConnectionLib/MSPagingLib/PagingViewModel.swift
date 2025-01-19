@@ -60,7 +60,7 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: Observab
                     self.items.append(contentsOf: newItems)
                 }
                 self.nextPageUrl = response.data?.links?.next
-                self.fullResponse = response.data
+                self.fullResponse = response
             } onFailure: { message in
                 self.errorMessages.append(message)
             } onStringStatus: { st in
