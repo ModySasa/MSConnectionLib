@@ -32,10 +32,11 @@ public actor NetworkManager {
         token: String? = nil
         , shouldDumpRequest : Bool = false
     ) async -> Result<T, MultipleDecodingErrors> {
+        print("```````` url \(url)")
         guard var components = URLComponents(string: url) else {
             return .failure(MultipleDecodingErrors(errors: [.other(URLError(.badURL))]))
         }
-        
+        print("```````` components \(components.url)")
         if let body = parameters {
             let jsonData = try? JSONEncoder().encode(body)
             if let jsonData = jsonData,
