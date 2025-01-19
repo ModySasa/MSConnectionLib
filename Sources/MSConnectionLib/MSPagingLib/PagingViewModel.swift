@@ -12,7 +12,7 @@ import SwiftUI
 open class PagingViewModel<Item: Identifiable & Codable , U : Codable>: ObservableObject {
     @Published public var items: [Item] = []
     @Published public var errorMessages: [String] = []
-    @Published var fullResponse : Codable? = nil
+    @Published public var fullResponse : Codable? = nil
     
     private var nextPageUrl: String?
     private var isLoading = false
