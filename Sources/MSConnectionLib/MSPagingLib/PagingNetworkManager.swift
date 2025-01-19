@@ -9,12 +9,12 @@ actor PagingNetworkManager<Item: Identifiable & Codable> : BaseUrlProviding{
     private let networkManager = NetworkManager()
     
     func getData<U:Encodable>(url: String , lang:String , token:String , parameters: U? = nil) async -> Result<CommonResponse<PaginatedResponse<Item>>, MultipleDecodingErrors> {
+        
+        print("```````` url \(url)")
         let theUrl = if (url.matches("^https?://")) {
-            print("`````` 1st url \(url)")
-            return url
+            url
         } else {
-            print("```````` heere else url  \(url)")
-            return getUrl(url)
+            getUrl(url)
         }
         
         print("```````` theUrl \(theUrl)")
