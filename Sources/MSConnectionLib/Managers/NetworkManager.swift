@@ -47,6 +47,8 @@ public actor NetworkManager {
             }
         }
         
+        print("```````` components after \(components.url)")
+        
         guard let theUrl = components.url else {
             return .failure(MultipleDecodingErrors(errors: [.other(URLError(.badURL))]))
         }
