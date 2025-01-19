@@ -43,7 +43,15 @@ public actor NetworkManager {
                let jsonObject = try? JSONSerialization.jsonObject(with: jsonData, options: []),
                let parameters = jsonObject as? [String: Any] {
                 
-                components.queryItems = parameters.map { URLQueryItem(name: "\($0)", value: "\($1)") }
+                // Step 1: Get existing query items (if any)
+                       var existingQueryItems = components.queryItems ?? []
+                       
+                       // Step 2: Convert parameters to URLQueryItem and append to existing query items
+                       let newQueryItems = parameters.map { URLQueryItem(name: "\($0)", value: "\($1)") }
+                       existingQueryItems.append(contentsOf: newQueryItems)
+                       
+                       // Step 3: Set the merged query items back to components
+                       components.queryItems = existingQueryItems
             }
         }
         
