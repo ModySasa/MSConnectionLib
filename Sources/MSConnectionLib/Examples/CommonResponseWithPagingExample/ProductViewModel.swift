@@ -11,7 +11,7 @@ class ProductViewModel: ObservableObject {
     @Published var products: [Product] = []
     @Published var product: Product? = nil
     @Published var errorMessages: [String] = []
-    @Published var pagingViewModel: PagingViewModel<Product , ProductRequest , ProductResponse> = .init(endPoint: "products" , lang: "en")
+    @Published var pagingViewModel: PagingViewModel<Product , ProductRequest , ProductResponse , BaseViewModel> = .init(endPoint: "products" , lang: "en")
     
     private var networkManager = ProductNetworkManager()
     private var nextPageUrl: String? = nil
@@ -48,7 +48,7 @@ class ProductViewModel: ObservableObject {
     }
 }
 
-class ProductsPagingViewModel: PagingViewModel<Product , ProductRequest , HomeResponse> {
+class ProductsPagingViewModel: PagingViewModel<Product , ProductRequest , HomeResponse , BaseViewModel> {
 //    @Published var products: [Product] = []
 //    @Published var product: Product? = nil
 //    @Published var errorMessages: [String] = []

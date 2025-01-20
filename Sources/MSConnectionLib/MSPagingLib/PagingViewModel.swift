@@ -9,10 +9,11 @@
 import Foundation
 import SwiftUI
 
-open class PagingViewModel<Item: Identifiable & Codable , U : Codable , Result : Codable>: ObservableObject {
+open class PagingViewModel<Item: Identifiable & Codable , U : Codable , Result : Codable , VM:BaseViewModel>: ObservableObject {
     @Published public var items: [Item] = []
     @Published public var errorMessages: [String] = []
     @Published public var result : Result? = nil
+    @Published public var vm : VM? = nil
     
     private var nextPageUrl: String?
     private var isLoading = false
@@ -22,7 +23,7 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable , Result :
     private let token: String
     private var parameters : U?
     
-    public init(endPoint: String , lang : String , parameters: U? = nil) {
+    public init(endPoint: String , lang : String , parameters: U? = nil , vm: VM? = nil) {
         self.endPoint = endPoint
         self.lang = lang
         if let tok = URLPrefHelper.shared.getToken() {
@@ -31,6 +32,7 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable , Result :
             self.token = ""
         }
         self.parameters = parameters
+        self.vm = vm
     }
     
     @MainActor
