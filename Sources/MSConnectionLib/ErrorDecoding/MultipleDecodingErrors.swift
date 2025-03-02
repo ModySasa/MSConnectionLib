@@ -13,4 +13,8 @@ public struct MultipleDecodingErrors: Error {
     public var description: String {
         errors.map { $0.description }.joined(separator: "\n")
     }
+    
+    public static func failure(_ errors: [DecodingError]) -> MultipleDecodingErrors {
+        .init(errors: errors)
+    }
 }
