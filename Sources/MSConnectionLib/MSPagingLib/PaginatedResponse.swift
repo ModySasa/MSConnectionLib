@@ -24,7 +24,12 @@ public struct PaginatedResponse<Item: Codable, Result: Codable>: Codable {
         // Decode known properties
         data = try container.decodeIfPresent([Item].self, forKey: .data)
         meta = try container.decodeIfPresent(Meta.self, forKey: .meta)
-        links = try container.decodeIfPresent(Links.self, forKey: .links)
+        if let linksObject = try? container.decode(Links.self, forKey: .links) {
+            links = linksObject
+        } else {
+            links = nil
+        }
+//        links = try container.decodeIfPresent(Links.self, forKey: .links)
 
         // Decode additional data
         let additionalContainer = try decoder.singleValueContainer()
