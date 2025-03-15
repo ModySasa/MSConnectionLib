@@ -22,10 +22,12 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable , Result :
     private let lang: String
     private let token: String
     private var parameters : U?
+    private var isPost : Bool = false
     
-    public init(endPoint: String , lang : String , parameters: U? = nil , vm: VM? = nil) {
+    public init(endPoint: String , lang : String , isPost : Bool = false , parameters: U? = nil , vm: VM? = nil) {
         self.endPoint = endPoint
         self.lang = lang
+        self.isPost = isPost
         if let tok = URLPrefHelper.shared.getToken() {
             self.token = tok
         } else {
@@ -54,7 +56,11 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable , Result :
         isLoading = true
         defer { isLoading = false }
 
-        let result = await networkManager.getData(url: url, lang: lang, token: token , parameters: parameters)
+        let result = if(!isPost) {
+            await networkManager.getData(url: url, lang: lang, token: token , parameters: parameters)
+        } else {
+            await networkManager.postData(url: url, lang: lang, token: token, parameters: parameters)
+        }
         switch result {
         case .success(let response):
             response.handleStatus {
