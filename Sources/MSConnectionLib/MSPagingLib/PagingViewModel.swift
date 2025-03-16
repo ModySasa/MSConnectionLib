@@ -16,6 +16,8 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable , Result :
     @Published public var vm : VM? = nil
     
     private var nextPageUrl: String?
+    private var totalItemsCount: Int?
+    private var totalPagesCount: Int?
     private var isLoading = false
     private let endPoint: String
     private let networkManager: PagingNetworkManager<Item , Result> = .init()
@@ -69,6 +71,8 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable , Result :
                 }
                 self.result = response.data?.additionalData
                 self.nextPageUrl = response.data?.links?.next
+                self.totalItemsCount = response.data?.meta?.total ?? 0
+                self.totalPagesCount = response.data?.meta?.total_pages ?? 0
             } onFailure: { message in
                 self.errorMessages.append(message)
             } onStringStatus: { st in
@@ -78,6 +82,8 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable , Result :
                     }
                     self.result = response.data?.additionalData
                     self.nextPageUrl = response.data?.links?.next
+                    self.totalItemsCount = response.data?.meta?.total ?? 0
+                    self.totalPagesCount = response.data?.meta?.total_pages ?? 0
                 }
             }
         case .failure(let error):
