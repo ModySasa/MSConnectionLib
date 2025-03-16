@@ -16,8 +16,8 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable , Result :
     @Published public var vm : VM? = nil
     
     private var nextPageUrl: String?
-    private var totalItemsCount: Int?
-    private var totalPagesCount: Int?
+    @Published public var totalItemsCount: Int?
+    @Published public var totalPagesCount: Int?
     private var isLoading = false
     private let endPoint: String
     private let networkManager: PagingNetworkManager<Item , Result> = .init()
