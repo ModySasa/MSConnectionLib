@@ -8,7 +8,7 @@
 import Foundation
 
 public struct CommonResponse<T: Codable>: Codable {
-    public let status: Status
+    public let status: Status?
     public let message: String?
     public let data: T?
     public let error: ErrorResponse? // Single error string or error object
@@ -16,7 +16,7 @@ public struct CommonResponse<T: Codable>: Codable {
 
     // Custom initializer
     public init(
-        status: Status,
+        status: Status?,
         message: String?,
         data: T?,
         error: ErrorResponse? = nil,
@@ -61,60 +61,64 @@ public struct CommonResponse<T: Codable>: Codable {
         onStringStatus: ((String?) -> Void)? = nil,
         handleErrors: ((ErrorResponse? , [String: [String]]??) -> Void)? = nil
     ) {
-        switch self.status {
-        case .boolean(let value):
-            value ? onSuccess() : handleFailure(message: self.message, onFailure: onFailure, handleErrors: handleErrors)
-        case .string(let value):
-            print("String status: \(value)")
-            if let onStringStatus {
-                onStringStatus(value)
-            }
-            if let handleErrors {
-                handleErrors(error , errors)
-            }
-        case .int(let value):
-            print("Integer status: \(value)")
-            if value == 1 {
-                onSuccess()
-            } else {
-                if let message = self.message , let onFailure {
-                    onFailure(message)
+        if let status = self.status{
+            switch status {
+            case .boolean(let value):
+                value ? onSuccess() : handleFailure(message: self.message, onFailure: onFailure, handleErrors: handleErrors)
+            case .string(let value):
+                print("String status: \(value)")
+                if let onStringStatus {
+                    onStringStatus(value)
+                }
+                if let handleErrors {
+                    handleErrors(error , errors)
+                }
+            case .int(let value):
+                print("Integer status: \(value)")
+                if value == 1 {
+                    onSuccess()
+                } else {
+                    if let message = self.message , let onFailure {
+                        onFailure(message)
+                    }
+                    if let handleErrors {
+                        handleErrors(error , errors)
+                    }
+                }
+            case .yesNo(let value):
+                print("Yes/No status: \(value)")
+                if value {
+                    onSuccess()
+                } else {
+                    if let message = self.message , let onFailure {
+                        onFailure(message)
+                    }
+                    if let handleErrors {
+                        handleErrors(error , errors)
+                    }
+                }
+            case .oneZero(let value):
+                if value {
+                    onSuccess()
+                } else {
+                    if let message = self.message , let onFailure {
+                        onFailure(message)
+                    }
+                    if let handleErrors {
+                        handleErrors(error , errors)
+                    }
+                }
+            case .unknown:
+                print("Unknown status")
+                if let onStringStatus {
+                    onStringStatus(self.message)
                 }
                 if let handleErrors {
                     handleErrors(error , errors)
                 }
             }
-        case .yesNo(let value):
-            print("Yes/No status: \(value)")
-            if value {
-                onSuccess()
-            } else {
-                if let message = self.message , let onFailure {
-                    onFailure(message)
-                }
-                if let handleErrors {
-                    handleErrors(error , errors)
-                }
-            }
-        case .oneZero(let value):
-            if value {
-                onSuccess()
-            } else {
-                if let message = self.message , let onFailure {
-                    onFailure(message)
-                }
-                if let handleErrors {
-                    handleErrors(error , errors)
-                }
-            }
-        case .unknown:
-            print("Unknown status")
-            if let onStringStatus {
-                onStringStatus(self.message)
-            }
-            if let handleErrors {
-                handleErrors(error , errors)
-            }
+        } else {
+            onSuccess()
         }
     }
     
@@ -137,60 +141,64 @@ public struct CommonResponse<T: Codable>: Codable {
         onStringStatus: ((String?) async -> Void)? = nil,
         handleErrors: ((ErrorResponse? , [String: [String]]??) async -> Void)? = nil
     ) async {
-        switch self.status {
-        case .boolean(let value):
-            value ? await onSuccess() : await handleFailure(message: self.message, onFailure: onFailure, handleErrors: handleErrors)
-        case .string(let value):
-            print("String status: \(value)")
-            if let onStringStatus {
-                await onStringStatus(value)
-            }
-            if let handleErrors {
-                await handleErrors(error , errors)
-            }
-        case .int(let value):
-            print("Integer status: \(value)")
-            if value == 1 {
-                await onSuccess()
-            } else {
-                if let message = self.message , let onFailure {
-                    await onFailure(message)
+        if let status = self.status {
+            switch status {
+            case .boolean(let value):
+                value ? await onSuccess() : await handleFailure(message: self.message, onFailure: onFailure, handleErrors: handleErrors)
+            case .string(let value):
+                print("String status: \(value)")
+                if let onStringStatus {
+                    await onStringStatus(value)
+                }
+                if let handleErrors {
+                    await handleErrors(error , errors)
+                }
+            case .int(let value):
+                print("Integer status: \(value)")
+                if value == 1 {
+                    await onSuccess()
+                } else {
+                    if let message = self.message , let onFailure {
+                        await onFailure(message)
+                    }
+                    if let handleErrors {
+                        await handleErrors(error , errors)
+                    }
+                }
+            case .yesNo(let value):
+                print("Yes/No status: \(value)")
+                if value {
+                    await onSuccess()
+                } else {
+                    if let message = self.message , let onFailure {
+                        await onFailure(message)
+                    }
+                    if let handleErrors {
+                        await handleErrors(error , errors)
+                    }
+                }
+            case .oneZero(let value):
+                if value {
+                    await onSuccess()
+                } else {
+                    if let message = self.message , let onFailure {
+                        await onFailure(message)
+                    }
+                    if let handleErrors {
+                        await handleErrors(error , errors)
+                    }
+                }
+            case .unknown:
+                print("Unknown status")
+                if let onStringStatus {
+                    await onStringStatus(self.message)
                 }
                 if let handleErrors {
                     await handleErrors(error , errors)
                 }
             }
-        case .yesNo(let value):
-            print("Yes/No status: \(value)")
-            if value {
-                await onSuccess()
-            } else {
-                if let message = self.message , let onFailure {
-                    await onFailure(message)
-                }
-                if let handleErrors {
-                    await handleErrors(error , errors)
-                }
-            }
-        case .oneZero(let value):
-            if value {
-                await onSuccess()
-            } else {
-                if let message = self.message , let onFailure {
-                    await onFailure(message)
-                }
-                if let handleErrors {
-                    await handleErrors(error , errors)
-                }
-            }
-        case .unknown:
-            print("Unknown status")
-            if let onStringStatus {
-                await onStringStatus(self.message)
-            }
-            if let handleErrors {
-                await handleErrors(error , errors)
-            }
+        } else {
+            await onSuccess()
         }
     }
     
