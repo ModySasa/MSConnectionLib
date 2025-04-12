@@ -34,7 +34,7 @@ public struct CommonResponse<T: Codable>: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         // Decode status
-        self.status = try container.decode(Status.self, forKey: .status)
+        self.status = try container.decodeIfPresent(Status.self, forKey: .status)
         
         // Decode message
         self.message = try container.decodeIfPresent(String.self, forKey: .message)
