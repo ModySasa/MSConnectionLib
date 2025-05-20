@@ -279,7 +279,7 @@ public actor NetworkManager {
         images: [UIImage],
         imagesNames: [String],
         keys: [String],
-        body: U,
+        body: U?,
         responseType: T.Type,
         token: String? = nil,
         maxSizeInMB: Double = 2
@@ -310,20 +310,25 @@ public actor NetworkManager {
             var bodyData = Data()
             
             // Convert `body` to a dictionary and append each field individually
-            let bodyDict = try body.toDictionary()
-            for (key, value) in bodyDict {
-                bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
-                if let arrayValue = value as? [Int] {
-                    dump(arrayValue)
-                    for arrayItem in arrayValue {
-                        bodyData.append("Content-Disposition: form-data; name=\"\(key)[]\"\r\n\r\n".data(using: .utf8)!)
-                        bodyData.append("\(arrayItem)\r\n".data(using: .utf8)!)
+            if let body {
+                let bodyDict = try body.toDictionary()
+                for (key, value) in bodyDict {
+                    bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
+                    if let arrayValue = value as? [Int] {
+                        dump(arrayValue)
+                        for arrayItem in arrayValue {
+                            bodyData.append("Content-Disposition: form-data; name=\"\(key)[]\"\r\n\r\n".data(using: .utf8)!)
+                            bodyData.append("\(arrayItem)\r\n".data(using: .utf8)!)
+                        }
+                    } else {
+                        bodyData.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
+                        bodyData.append("\(value)\r\n".data(using: .utf8)!)
                     }
-                } else {
-                    bodyData.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
-                    bodyData.append("\(value)\r\n".data(using: .utf8)!)
                 }
             }
+//            else {
+//                
+//            }
             
             print("Multipart Body Data: \(String(data: bodyData, encoding: .utf8) ?? "")")
             
