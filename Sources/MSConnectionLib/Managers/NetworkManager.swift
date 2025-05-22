@@ -134,11 +134,14 @@ public actor NetworkManager {
             
             // Start building multipart body
             var bodyData = Data()
+            let boundary = "Boundary-\(UUID().uuidString)"
+            request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+            request.setValue(lang, forHTTPHeaderField: "lang")
             
             if let body {
                 let bodyDict = try body.toDictionary()
                 for (key, value) in bodyDict {
-//                    bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
+                    bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
                     if let arrayValue = value as? [Int] {
                         dump(arrayValue)
                         for arrayItem in arrayValue {
