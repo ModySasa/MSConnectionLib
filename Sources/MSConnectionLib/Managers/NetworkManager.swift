@@ -313,22 +313,14 @@ public actor NetworkManager {
             if let body {
                 let bodyDict = try body.toDictionary()
                 for (key, value) in bodyDict {
-                    bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
                     if let arrayValue = value as? [Int] {
-//                        dump(arrayValue)
-//                        var arrayValues = "["
                         for (index , arrayItem) in arrayValue.enumerated() {
-//                            arrayValues.append("\(arrayItem)")
-//                            if(arrayItem != arrayValue.last!) {
-//                                arrayValues.append(",")
-//                            }
+                            bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
                             bodyData.append("Content-Disposition: form-data; name=\"\(key)[\(index)]\"\r\n\r\n".data(using: .utf8)!)
                             bodyData.append("\(arrayItem)\r\n".data(using: .utf8)!)
                         }
-//                        arrayValues.append("]")
-//                        bodyData.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
-//                        bodyData.append("\(arrayValues)\r\n".data(using: .utf8)!)
                     } else {
+                        bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
                         bodyData.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
                         bodyData.append("\(value)\r\n".data(using: .utf8)!)
                     }
