@@ -318,13 +318,13 @@ public actor NetworkManager {
 //                        dump(arrayValue)
                         var arrayValues = "["
                         for arrayItem in arrayValue {
-                            bodyData.append("Content-Disposition: form-data; name=\"\(key)[]\"\r\n\r\n".data(using: .utf8)!)
                             arrayValues.append("\(arrayItem)")
                             if(arrayItem != arrayValue.last!) {
                                 arrayValues.append(",")
                             }
                         }
                         arrayValues.append("]")
+                        bodyData.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
                         bodyData.append("\(arrayValues)\r\n".data(using: .utf8)!)
                     } else {
                         bodyData.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
