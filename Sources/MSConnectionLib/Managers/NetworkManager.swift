@@ -316,8 +316,8 @@ public actor NetworkManager {
                     bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
                     if let arrayValue = value as? [Int] {
                         dump(arrayValue)
-                        for arrayItem in arrayValue {
-                            bodyData.append("Content-Disposition: form-data; name=\"\(key)[]\"\r\n\r\n".data(using: .utf8)!)
+                        for (index, arrayItem) in arrayValue.enumerated() {
+                            bodyData.append("Content-Disposition: form-data; name=\"\(key)[\(index)]\"\r\n\r\n".data(using: .utf8)!)
                             bodyData.append("\(arrayItem)\r\n".data(using: .utf8)!)
                         }
                     } else {
