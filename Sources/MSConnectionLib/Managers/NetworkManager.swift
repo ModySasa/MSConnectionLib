@@ -324,7 +324,7 @@ public actor NetworkManager {
                             }
                         }
                         arrayValues.append("]")
-                        bodyData.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
+                        bodyData.append("Content-Disposition: form-data; name=\"\(key)[]\"\r\n\r\n".data(using: .utf8)!)
                         bodyData.append("\(arrayValues)\r\n".data(using: .utf8)!)
                     } else {
                         bodyData.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
