@@ -313,10 +313,23 @@ public actor NetworkManager {
             if let body {
                 let bodyDict = try body.toDictionary()
                 for (key, value) in bodyDict {
+//                    if let arrayValue = value as? [Int] {
+//                        for (index , arrayItem) in arrayValue.enumerated() {
+//                            bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
+//                            bodyData.append("Content-Disposition: form-data; name=\"\(key)[\(index)]\"\r\n\r\n".data(using: .utf8)!)
+//                            bodyData.append("\(arrayItem)\r\n".data(using: .utf8)!)
+//                        }
+//                    } else {
+//                        bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
+//                        bodyData.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
+//                        bodyData.append("\(value)\r\n".data(using: .utf8)!)
+//                    }
+                    
                     if let arrayValue = value as? [Int] {
-                        for (index , arrayItem) in arrayValue.enumerated() {
+                        dump(arrayValue)
+                        for arrayItem in arrayValue {
                             bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
-                            bodyData.append("Content-Disposition: form-data; name=\"\(key)[\(index)]\"\r\n\r\n".data(using: .utf8)!)
+                            bodyData.append("Content-Disposition: form-data; name=\"\(key)[]\"\r\n\r\n".data(using: .utf8)!)
                             bodyData.append("\(arrayItem)\r\n".data(using: .utf8)!)
                         }
                     } else {
