@@ -325,7 +325,7 @@ public actor NetworkManager {
 //                        bodyData.append("\(value)\r\n".data(using: .utf8)!)
 //                    }
                     
-                    if let arrayValue = value as? [Int] {
+                    if let arrayValue = value as? [Any] {
                         dump(arrayValue)
                         for arrayItem in arrayValue {
                             bodyData.append("--\(boundary)\r\n".data(using: .utf8)!)
