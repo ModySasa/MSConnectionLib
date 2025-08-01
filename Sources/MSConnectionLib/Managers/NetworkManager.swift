@@ -68,7 +68,7 @@ public actor NetworkManager {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue("application/json", forHTTPHeaderField: "Accept")
             request.setValue(lang, forHTTPHeaderField: "lang")
-            request.setValue(header?.keys.first ?? "", forHTTPHeaderField: header?.values.first ?? "")
+            request.setValue( header?.values.first ?? "", forHTTPHeaderField: header?.keys.first ?? "")
             
             if let token = token {
                 request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
