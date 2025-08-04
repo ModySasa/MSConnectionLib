@@ -30,7 +30,7 @@ public actor NetworkManager {
         parameters: U? = nil,
         responseType: T.Type,
         token: String? = nil,
-        header: [String:String]? = nil
+        headers: [String:String]? = nil
         , shouldDumpRequest : Bool = false
     ) async -> (Result<T, MultipleDecodingErrors> , Data?) {
 
@@ -68,7 +68,11 @@ public actor NetworkManager {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue("application/json", forHTTPHeaderField: "Accept")
             request.setValue(lang, forHTTPHeaderField: "lang")
-            request.setValue( header?.values.first ?? "", forHTTPHeaderField: header?.keys.first ?? "")
+            if let headers {
+                headers.forEach { (key: String, value: String) in
+                    request.setValue( value, forHTTPHeaderField: key)
+                }
+            }
             
             if let token = token {
                 request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
