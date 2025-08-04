@@ -5,8 +5,6 @@
 //  Created by Moha on 9/11/24.
 //
 
-import Foundation
-
 actor PagingNetworkManager<Item: Identifiable & Codable , R: Codable> : BaseUrlProviding{
     private let networkManager = NetworkManager()
     
@@ -26,32 +24,6 @@ actor PagingNetworkManager<Item: Identifiable & Codable , R: Codable> : BaseUrlP
             )
         } else {
             return await networkManager.get(
-                from: theUrl,
-                lang: lang,
-                parameters: networkManager.optionalBody,
-                responseType: CommonResponse<PaginatedResponse<Item , R>>.self,
-                token: token
-            )
-        }
-        
-    }
-    
-    func getResponseWithData<U:Encodable>(url: String , lang:String , token:String , parameters: U? = nil) async -> (Result<CommonResponse<PaginatedResponse<Item , R>>, MultipleDecodingErrors> , Data?) {
-        let theUrl = if (url.matches("^https?://")) {
-            url
-        } else {
-            getUrl(url)
-        }
-        if let parameters {
-            return await networkManager.getResponseWithData(
-                from: theUrl,
-                lang: lang,
-                parameters: parameters,
-                responseType: CommonResponse<PaginatedResponse<Item , R>>.self,
-                token: token
-            )
-        } else {
-            return await networkManager.getResponseWithData(
                 from: theUrl,
                 lang: lang,
                 parameters: networkManager.optionalBody,
