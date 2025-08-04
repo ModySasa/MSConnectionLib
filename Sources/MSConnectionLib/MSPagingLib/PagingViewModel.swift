@@ -9,27 +9,30 @@
 import Foundation
 import SwiftUI
 
-open class PagingViewModel<Item: Identifiable & Codable , U : Codable , Result : Codable , VM:BaseViewModel>: ObservableObject {
+open class PagingViewModel<Item: Identifiable & Codable , U : Codable , ResultOfCall : Codable , VM:BaseViewModel>: ObservableObject {
     @Published public var items: [Item] = []
     @Published public var errorMessages: [String] = []
-    @Published public var result : Result? = nil
+    @Published public var result : ResultOfCall? = nil
     @Published public var vm : VM? = nil
+    @Published public var data : Data? = nil
     
     private var nextPageUrl: String?
     @Published public var totalItemsCount: Int?
     @Published public var totalPagesCount: Int?
     private var isLoading = false
     private let endPoint: String
-    private let networkManager: PagingNetworkManager<Item , Result> = .init()
+    private let networkManager: PagingNetworkManager<Item , ResultOfCall> = .init()
     private let lang: String
     private let token: String
     private var parameters : U?
     private var isPost : Bool = false
+    private var dataNeeded : Bool = false
     
-    public init(endPoint: String , lang : String , isPost : Bool = false , parameters: U? = nil , vm: VM? = nil) {
+    public init(endPoint: String , lang : String , isPost : Bool = false , dataNeeded : Bool = false , parameters: U? = nil , vm: VM? = nil) {
         self.endPoint = endPoint
         self.lang = lang
         self.isPost = isPost
+        self.dataNeeded = dataNeeded
         if let tok = URLPrefHelper.shared.getToken() {
             self.token = tok
         } else {
@@ -58,10 +61,17 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable , Result :
         isLoading = true
         defer { isLoading = false }
 
-        let result = if(!isPost) {
-            await networkManager.getData(url: url, lang: lang, token: token , parameters: parameters)
+        var result : Result<CommonResponse<PaginatedResponse<Item, ResultOfCall>>, MultipleDecodingErrors>
+        if(!isPost) {
+            if(dataNeeded) {
+                let (r , d) = await networkManager.getResponseWithData(url: url, lang: lang, token: token , parameters: parameters)
+                result = r
+                self.data = d
+            } else {
+                result = await networkManager.getData(url: url, lang: lang, token: token , parameters: parameters)
+            }
         } else {
-            await networkManager.postData(url: url, lang: lang, token: token, parameters: parameters)
+            result = await networkManager.postData(url: url, lang: lang, token: token, parameters: parameters)
         }
         switch result {
         case .success(let response):
