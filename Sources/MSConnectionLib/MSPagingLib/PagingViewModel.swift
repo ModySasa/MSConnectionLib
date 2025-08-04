@@ -65,7 +65,6 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable , ResultOf
         if(!isPost) {
             if(dataNeeded) {
                 let (r , d) = await networkManager.getResponseWithData(url: url, lang: lang, token: token , parameters: parameters)
-                print("TEST PAGING ::: " , r , d)
                 result = r
                 self.data = d
             } else {

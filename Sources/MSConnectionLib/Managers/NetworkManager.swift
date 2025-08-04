@@ -95,7 +95,7 @@ public actor NetworkManager {
             // decoder.keyDecodingStrategy = .convertFromSnakeCase
             
             let response = try decoder.decode(T.self, from: data)
-            return (.success(response) , nil)
+            return (.success(response) , data)
             
         } catch let error as Swift.DecodingError {
             // Handle decoding errors
