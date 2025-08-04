@@ -14,7 +14,7 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable , ResultOf
     @Published public var errorMessages: [String] = []
     @Published public var result : ResultOfCall? = nil
     @Published public var vm : VM? = nil
-    @Published var data : Data? = nil
+    @Published public var data : Data? = nil
     
     private var nextPageUrl: String?
     @Published public var totalItemsCount: Int?
