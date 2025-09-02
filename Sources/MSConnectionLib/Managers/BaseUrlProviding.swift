@@ -49,7 +49,7 @@ public extension BaseUrlProviding {
         #endif
     }
     
-    private func url() -> String {
+    func url() -> String {
         return isTesting() ? testUrl : mainUrl
     }
     
