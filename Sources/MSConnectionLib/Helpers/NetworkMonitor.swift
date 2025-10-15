@@ -16,7 +16,7 @@ public class NetworkMonitor: ObservableObject {
     @Published public var isConnected = true
     @Published public var connectionType: NWInterface.InterfaceType?
     
-    init() {
+    public init() {
         monitor.pathUpdateHandler = { [weak self] path in
             DispatchQueue.main.async {
                 self?.isConnected = path.status == .satisfied
@@ -28,7 +28,7 @@ public class NetworkMonitor: ObservableObject {
         monitor.start(queue: queue)
     }
     
-    deinit {
+    public deinit {
         monitor.cancel()
     }
 }
