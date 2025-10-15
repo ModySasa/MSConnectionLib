@@ -28,7 +28,7 @@ public class NetworkMonitor: ObservableObject {
         monitor.start(queue: queue)
     }
     
-    public deinit {
+    deinit {
         monitor.cancel()
     }
 }
