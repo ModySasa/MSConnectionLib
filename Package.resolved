@@ -1,5 +1,5 @@
 {
-  "originHash" : "878778f526f4a96e3accc99ba4dda6d2d28d324291014c317634011c8e6ee596",
+  "originHash" : "044089e502e6b44f1f2635040254179421f71d47044277d545708a5cede2c121",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -83,6 +83,15 @@
       }
     },
     {
+      "identity" : "keypathcodingmacro",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ModySasa/KeyPathCodingMacro",
+      "state" : {
+        "branch" : "main",
+        "revision" : "2689363cfcfc022735dcc7531f40bdfe15b82d50"
+      }
+    },
+    {
       "identity" : "leveldb",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/leveldb.git",
@@ -116,6 +125,15 @@
       "state" : {
         "revision" : "ebc7251dd5b37f627c93698e4374084d98409633",
         "version" : "1.28.2"
+      }
+    },
+    {
+      "identity" : "swift-syntax",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-syntax.git",
+      "state" : {
+        "revision" : "4799286537280063c85a32f09884cfbca301b1a1",
+        "version" : "602.0.0"
       }
     }
   ],
