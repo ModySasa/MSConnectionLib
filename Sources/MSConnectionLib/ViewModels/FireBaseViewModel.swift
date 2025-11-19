@@ -67,7 +67,7 @@ public class FireBaseViewModel : ObservableObject {
         let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
         print("VERSION ::: \(currentVersion)")
         
-        let isNewerVersion = currentVersion.compare(version, options: .numeric) == .orderedDescending
+        let isNewerVersion = currentVersion.compare(version, options: .numeric) != .orderedAscending
         print("Is newer version: \(isNewerVersion)")
         return isNewerVersion
     }
