@@ -17,7 +17,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/firebase/firebase-ios-sdk", .upToNextMajor(from: "11.1.0")),
-        .package(url: "https://github.com/ModySasa/KeyPathCodingMacro", branch: "main")
+//        .package(url: "https://github.com/ModySasa/KeyPathCodingMacro", branch: "main")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -29,7 +29,7 @@ let package = Package(
                 .product(name: "FirebaseRemoteConfig", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseDatabase", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseMessaging", package: "firebase-ios-sdk"),
-                .product(name: "KeyPathCodingMacro", package: "KeyPathCodingMacro"),
+//                .product(name: "KeyPathCodingMacro", package: "KeyPathCodingMacro"),
             ]
         ),
         .testTarget(
