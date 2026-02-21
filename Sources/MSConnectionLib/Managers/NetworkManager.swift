@@ -246,7 +246,20 @@ public actor NetworkManager {
 #else
             
 #endif
-            (data, _) = try await URLSession.shared.data(for: request)
+            var urlResponse: URLResponse
+            (data, urlResponse) = try await URLSession.shared.data(for: request)
+            
+            if let httpResponse = urlResponse as? HTTPURLResponse {
+                let statusCode = httpResponse.statusCode
+                guard (200...299).contains(statusCode) else {
+                    logData(data) // log the HTML/error body
+                    return .failure(MultipleDecodingErrors(errors: [
+                        .other(URLError(.badServerResponse, userInfo: [
+                            NSLocalizedDescriptionKey: "HTTP \(statusCode) error"
+                        ]))
+                    ]))
+                }
+            }
             
             logData(data)
             
@@ -469,10 +482,23 @@ public actor NetworkManager {
             // Set the multipart form data as the request body
             request.httpBody = bodyData
             
+            var urlResponse: URLResponse
             // Perform the request
-            (data, _) = try await URLSession.shared.data(for: request)
-            
+            (data, urlResponse) = try await URLSession.shared.data(for: request)
+                        
+            if let httpResponse = urlResponse as? HTTPURLResponse {
+                let statusCode = httpResponse.statusCode
+                guard (200...299).contains(statusCode) else {
+                    logData(data) // log the HTML/error body
+                    return .failure(MultipleDecodingErrors(errors: [
+                        .other(URLError(.badServerResponse, userInfo: [
+                            NSLocalizedDescriptionKey: "HTTP \(statusCode) error"
+                        ]))
+                    ]))
+                }
+            }
             logData(data)
+
             
             let decoder = JSONDecoder()
             let response = try decoder.decode(T.self, from: data)
