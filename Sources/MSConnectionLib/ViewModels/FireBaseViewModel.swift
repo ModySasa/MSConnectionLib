@@ -35,7 +35,7 @@ public class FireBaseViewModel : ObservableObject {
     func setFirebaseSettings(afterFetch : @escaping ([String:Any])-> Void){
         ref = Database.database().reference().child("settings")
         print("config real time started")
-        ref.observeSingleEvent(of: .value) { snapshot in
+        ref.observeSingleEvent(of: .value) { [self] snapshot in
             guard let value = snapshot.value as? [String:Any] else { return }
             
             fireBaseSettings = FirebaseSettings(value)
