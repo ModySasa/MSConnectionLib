@@ -35,19 +35,37 @@ public class FireBaseViewModel : ObservableObject {
     func setFirebaseSettings(afterFetch : @escaping ([String:Any])-> Void){
         ref = Database.database().reference().child("settings")
         print("config real time started")
-        ref.observe(DataEventType.value, with: { [self] snapshot in
-            fireBaseSettings = FirebaseSettings.init(snapshot.value as! [String:Any])
+        ref.observeSingleEvent(of: .value) { snapshot in
+            guard let value = snapshot.value as? [String:Any] else { return }
+            
+            fireBaseSettings = FirebaseSettings(value)
             mainUrl = fireBaseSettings.base_url
             testUrl = fireBaseSettings.test_url
             appVersion = fireBaseSettings.ios_store_version
             must_update_ios = fireBaseSettings.must_update
-            paymentLiveKey = fireBaseSettings.paymentLiveKey
-            paymentTestKey = fireBaseSettings.paymentTestKey
-            URLPrefHelper.shared.setUrls(mainUrl: fireBaseSettings.base_url , testUrl: fireBaseSettings.test_url)
+
+            URLPrefHelper.shared.setUrls(
+                mainUrl: fireBaseSettings.base_url,
+                testUrl: fireBaseSettings.test_url
+            )
             print("TAG PRINT::: AFTERCONFIG:::MAIN URL ::: \(fireBaseSettings.base_url)")
             print("TAG PRINT::: AFTERCONFIG:::TEST URL ::: \(fireBaseSettings.test_url)")
-            afterFetch(snapshot.value as! [String:Any])
-        })
+
+            afterFetch(value)
+        }
+//        ref.observe(DataEventType.value, with: { [self] snapshot in
+//            fireBaseSettings = FirebaseSettings.init(snapshot.value as! [String:Any])
+//            mainUrl = fireBaseSettings.base_url
+//            testUrl = fireBaseSettings.test_url
+//            appVersion = fireBaseSettings.ios_store_version
+//            must_update_ios = fireBaseSettings.must_update
+//            paymentLiveKey = fireBaseSettings.paymentLiveKey
+//            paymentTestKey = fireBaseSettings.paymentTestKey
+//            URLPrefHelper.shared.setUrls(mainUrl: fireBaseSettings.base_url , testUrl: fireBaseSettings.test_url)
+//            print("TAG PRINT::: AFTERCONFIG:::MAIN URL ::: \(fireBaseSettings.base_url)")
+//            print("TAG PRINT::: AFTERCONFIG:::TEST URL ::: \(fireBaseSettings.test_url)")
+//            afterFetch(snapshot.value as! [String:Any])
+//        })
     }
     
     public func getAppVersionThenSetConfig(afterFetch : @escaping ([String:Any])-> Void){
