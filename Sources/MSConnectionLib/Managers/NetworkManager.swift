@@ -251,7 +251,7 @@ public actor NetworkManager {
             
             if let httpResponse = urlResponse as? HTTPURLResponse {
                 let statusCode = httpResponse.statusCode
-                guard (200...299).contains(statusCode) else {
+                guard (200...401).contains(statusCode) else {
                     logData(data) // log the HTML/error body
                     return .failure(MultipleDecodingErrors(errors: [
                         .other(URLError(.badServerResponse, userInfo: [
