@@ -28,15 +28,19 @@ open class PagingViewModel<Item: Identifiable & Codable , U : Codable , ResultOf
     private var isPost : Bool = false
     private var dataNeeded : Bool = false
     
-    public init(endPoint: String , lang : String , isPost : Bool = false , dataNeeded : Bool = false , parameters: U? = nil , vm: VM? = nil) {
+    public init(endPoint: String , lang : String,token: String? = nil , isPost : Bool = false , dataNeeded : Bool = false , parameters: U? = nil , vm: VM? = nil) {
         self.endPoint = endPoint
         self.lang = lang
         self.isPost = isPost
         self.dataNeeded = dataNeeded
-        if let tok = URLPrefHelper.shared.getToken() {
-            self.token = tok
-        } else {
-            self.token = ""
+        if let tokk = token{
+            self.token = tokk
+        }else{
+            if let tok = URLPrefHelper.shared.getToken() {
+                self.token = tok
+            } else {
+                self.token = ""
+            }
         }
         self.parameters = parameters
         self.vm = vm
