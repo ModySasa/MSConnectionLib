@@ -46,13 +46,24 @@ public actor NetworkManager {
                 
                 var existingQueryItems = components.queryItems ?? []
                 
-                let newQueryItems = parameters.map { URLQueryItem(name: "\($0)", value: "\($1)") }
+                //                let newQueryItems = parameters.map { URLQueryItem(name: "\($0)", value: "\($1)") }
+                var newQueryItems: [URLQueryItem] = []
+                
+                for (key, value) in parameters {
+                    if let arrayValue = value as? [Any] {
+                        for item in arrayValue {
+                            newQueryItems.append(URLQueryItem(name: "\(key)[]", value: "\(item)"))
+                        }
+                    } else {
+                        newQueryItems.append(URLQueryItem(name: "\(key)", value: "\(value)"))
+                    }
+                }
                 existingQueryItems.append(contentsOf: newQueryItems)
                 
                 components.queryItems = existingQueryItems
             }
         }
-                
+        
         guard let theUrl = components.url else {
             return (.failure(MultipleDecodingErrors(errors: [.other(URLError(.badURL))])) , nil)
         }
@@ -139,7 +150,18 @@ public actor NetworkManager {
                 
                 var existingQueryItems = components.queryItems ?? []
                 
-                let newQueryItems = parameters.map { URLQueryItem(name: "\($0)", value: "\($1)") }
+                //                let newQueryItems = parameters.map { URLQueryItem(name: "\($0)", value: "\($1)") }
+                var newQueryItems: [URLQueryItem] = []
+                
+                for (key, value) in parameters {
+                    if let arrayValue = value as? [Any] {
+                        for item in arrayValue {
+                            newQueryItems.append(URLQueryItem(name: "\(key)[]", value: "\(item)"))
+                        }
+                    } else {
+                        newQueryItems.append(URLQueryItem(name: "\(key)", value: "\(value)"))
+                    }
+                }
                 existingQueryItems.append(contentsOf: newQueryItems)
                 
                 components.queryItems = existingQueryItems
